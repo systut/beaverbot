@@ -1,0 +1,283 @@
+<?xml version="1.0"?>
+<robot name="beaverbot" xmlns:xacro="http://ros.org/wiki/xacro">
+	
+  <!-- Import all robot parts which were xacroed -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/beaverbot.xacro" />
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/colors.xacro" />
+  <!-- Import robot properties -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/properties.xacro" />
+  <!-- Import sensor and actuator properties -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/sensors_and_actuators.xacro" />
+  <xacro:arg name="robot_namespace" default="/" />
+
+  <!--<link name="world"/>-->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.24 0.74 0.46"/>	<!-- rough robot size: x=1.24 y=0.74 z=0.46 -->
+      </geometry>
+      <origin rpy="0 0 0" xyz="0.395 0.0 0.12"/>
+    </collision>
+    <!--<xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" />-->
+  </link>
+  <gazebo reference="base_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <link name="base">
+    <visual>
+      <geometry>
+        <box size="0.52 0.21 0.21"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+    <xacro:inertial_box mass="${base_mass}" x="0.52" y="0.21" z="0.21" />
+  </link>
+  <gazebo reference="base">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <joint name="base_link_to_base" type="fixed">
+    <parent link="base_link"/>
+    <child link="base"/>
+    <origin xyz="0.11 0.0 0.061" />
+  </joint>
+
+  <link name="robot_center">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01" />
+      </geometry>
+      <material name="Red"/>
+    </visual>
+  </link>
+  <gazebo reference="robot_center">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <joint name="base_link_to_robot_center" type="fixed">
+    <parent link="base_link"/>
+    <child link="robot_center"/>
+    <origin xyz="0.415 0.0 0.0" />
+  </joint>
+
+<!--
+<link name="collision_box_test">
+  <visual>
+    <geometry>
+      <box size="0.01 0.01 0.01"/>
+    </geometry>
+    <material name="red"/>
+  </visual>
+  <xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+</link>
+<gazebo reference="test">
+  <material>Gazebo/Black</material>
+</gazebo>
+<joint name="base_link_to_collision_box_test" type="fixed">
+  <parent link="base_link"/>
+  <child link="collision_box"/>
+  <origin xyz="0.395 0.0 0.12" />
+</joint>
+-->
+  
+  <!-- ////////////////////////// Base Link and Wheel Connections and Links ////////////////////////// -->
+
+  <xacro:default_box parent="base" child_name="back_base_support_frame" mass="${base_support_frame_mass}" sizex="0.05" sizey="0.40" sizez="0.02" ox="-0.11" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="base" child_name="front_base_support_frame" mass="${base_support_frame_mass}" sizex="0.05" sizey="0.40" sizez="0.02" ox="0.11" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_X parent="back_base_support_frame" child_name="zylinder_base_support_left" mass="${zylinder_base_support_mass}" length="0.52" radius="0.0175" ox="0.11" oy="0.2" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_X parent="back_base_support_frame" child_name="zylinder_base_support_right" mass="${zylinder_base_support_mass}" length="0.52" radius="0.0175" ox="0.11" oy="-0.2" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="base" child_name="support_link" mass="${support_link_mass}" sizex="0.022" sizey="0.4" sizez="0.022" ox="0.26" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_zylinder_in_Y parent="base" child_name="wheel_support_left" mass="${wheel_support_mass}" length="0.13" radius="0.05" ox="-0.11" oy="0.155" oz="-0.061" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Black" />
+  <xacro:default_zylinder_in_Y parent="base" child_name="wheel_support_right" mass="${wheel_support_mass}" length="0.13" radius="0.05" ox="-0.11" oy="-0.155" oz="-0.061" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="lidar_base" mass="${lidar_base_mass}" length="0.025" radius="0.025" ox="0.01" oy="0.0" oz="0.015" roll="0.0" yaw="0.0" pitch="0.0" color="Black" />
+
+  <!-- <xacro:default_zylinder_in_Z parent="front_frame_black" child_name="front_light_left" mass="${front_light_mass}" length="0.005" radius="0.025" ox="0.001" oy="0.175" oz="0.12" roll="0.0" pitch="${pi/2}" yaw="0.0" color="White" />
+  <xacro:default_zylinder_in_Z parent="front_frame_black" child_name="front_light_right" mass="${front_light_mass}" length="0.005" radius="0.025" ox="0.001" oy="-0.175" oz="0.12" roll="0.0" pitch="${pi/2}" yaw="0.0" color="White" /> -->
+
+  <xacro:default_box parent="base" child_name="back_light" mass="${back_light_mass}" sizex="0.005" sizey="0.1" sizez="0.04" ox="-0.26" oy="0.0" oz="0.055" yaw="0.0" pitch="0.0" roll="0.0" color="Red" />
+
+  <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+  
+  <!-- ////////////////////////// Outer frame with Links and Plates ////////////////////////// -->
+
+  <xacro:default_box parent="base" child_name="top_support" mass="${top_support_mass}" sizex="0.022" sizey="0.63" sizez="0.022" ox="0.26" oy="0.0" oz="0.245" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <!-- <xacro:default_box parent="top_support" child_name="top_frame_yellow" mass="${top_frame_yellow_mass}" sizex="0.24" sizey="0.64" sizez="0.005" ox="0.125" oy="0.0" oz="0.01" yaw="0.0" pitch="0.0" roll="0.0" color="Yellow" /> -->
+  <!-- <xacro:default_box parent="top_frame_yellow" child_name="top_frame_black" mass="${top_frame_black_mass}" sizex="0.34" sizey="0.64" sizez="0.005" ox="0.29" oy="0.0" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Black" /> -->
+  <!-- <xacro:default_box parent="top_frame_black" child_name="front_frame_black" mass="${front_frame_black_mass}" sizex="0.005" sizey="0.64" sizez="0.41" ox="0.175" oy="0.0" oz="-0.205" yaw="0.0" pitch="0.0" roll="0.0" color="Black" /> -->
+  <!-- <xacro:default_box parent="front_frame_black" child_name="soft_damper" mass="${soft_damper_mass}" sizex="0.05" sizey="0.66" sizez="0.05" ox="0.025" oy="0.0" oz="-0.18" yaw="0.0" pitch="0.0" roll="0.0" color="Black" /> -->
+  
+  <!-- <xacro:default_zylinder_in_X parent="top_support" child_name="left_side_top_support" mass="${long_zylinder_mass}" length="1.13" radius="0.0125" ox="0.025" oy="0.315" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_X parent="top_support" child_name="right_side_top_support" mass="${long_zylinder_mass}" length="1.13" radius="0.0125" ox="0.025" oy="-0.315" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_X parent="top_support" child_name="left_side_bottom_support" mass="${long_zylinder_mass}" length="1.13" radius="0.0125" ox="0.025" oy="0.315" oz="-0.39" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_X parent="top_support" child_name="right_side_bottom_support" mass="${long_zylinder_mass}" length="1.13" radius="0.0125" ox="0.025" oy="-0.315" oz="-0.39" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="left_side_middle_support" mass="${short_zylinder_mass}" length="0.39" radius="0.0125" ox="0.022" oy="0.315" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="right_side_middle_support" mass="${short_zylinder_mass}" length="0.39" radius="0.0125" ox="0.022" oy="-0.315" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="left_side_front_support" mass="${short_zylinder_mass}" length="0.41" radius="0.0125" ox="0.577" oy="0.315" oz="-0.215" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="right_side_front_support" mass="${short_zylinder_mass}" length="0.41" radius="0.0125" ox="0.577" oy="-0.315" oz="-0.215" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="left_side_top_support" child_name="left_side_back_support" mass="${short_zylinder_mass}" length="0.41" radius="0.0125" ox="-0.565" oy="0.0" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="right_side_top_support" child_name="right_side_back_support" mass="${short_zylinder_mass}" length="0.41" radius="0.0125" ox="-0.565" oy="0.0" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" /> -->
+
+  <!-- <xacro:default_box parent="top_support" child_name="left_side_middle_box" mass="${short_zylinder_mass}" sizex="0.022" sizey="0.022" sizez="0.39" ox="0.232" oy="0.315" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="top_support" child_name="right_side_middle_box" mass="${short_zylinder_mass}" sizex="0.022" sizey="0.022" sizez="0.39" ox="0.232" oy="-0.315" oz="-0.195" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="left_side_back_support" child_name="left_side_yellow_wall" mass="2.95" sizex="0.785" sizey="0.005" sizez="0.41" ox="0.39275" oy="0.0125" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Yellow" />
+  <xacro:default_box parent="left_side_back_support" child_name="left_side_black_wall" mass="0.95" sizex="0.325" sizey="0.005" sizez="0.41" ox="0.9475" oy="0.0125" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_box parent="right_side_back_support" child_name="right_side_yellow_wall" mass="2.95" sizex="0.785" sizey="0.005" sizez="0.41" ox="0.39275" oy="-0.0125" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Yellow" />
+  <xacro:default_box parent="right_side_back_support" child_name="right_side_black_wall" mass="0.95" sizex="0.325" sizey="0.005" sizez="0.41" ox="0.9475" oy="-0.0125" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Black" /> -->
+  <!-- /////////////////////////////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Dust Box ////////////////////////// -->
+  
+  <!-- <xacro:default_box parent="front_frame_black" child_name="dustbox_support" mass="${dustbox_big_mass}" sizex="0.205" sizey="0.64" sizez="0.022" ox="-0.103" oy="0.0" oz="-0.06" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="dustbox_support" child_name="dustbox_left" mass="${dustbox_small_mass}" sizex="0.19" sizey="0.005" sizez="0.16" ox="0.0" oy="0.31" oz="-0.08" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="dustbox_support" child_name="dustbox_right" mass="${dustbox_small_mass}" sizex="0.19" sizey="0.005" sizez="0.16" ox="0.0" oy="-0.31" oz="-0.08" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="dustbox_support" child_name="dustbox_bottom" mass="${dustbox_big_mass}" sizex="0.19" sizey="0.62" sizez="0.005" ox="0.0" oy="0.0" oz="-0.1625" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="dustbox_support" child_name="dustbox_front" mass="${dustbox_big_mass}" sizex="0.005" sizey="0.62" sizez="0.16" ox="0.095" oy="0.0" oz="-0.08" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="dustbox_bottom" child_name="dustbox_shovel" mass="${dustbox_shovel_mass}" sizex="0.12" sizey="0.60" sizez="0.005" ox="-0.145" oy="0.0" oz="-0.02" yaw="0.0" pitch="-0.3" roll="0.0" color="White" />
+   -->
+  <!-- ////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Brush ////////////////////////// -->
+  
+  <!-- <xacro:default_zylinder_in_Z parent="left_side_front_support" child_name="left_brush_zylinder" mass="${brush_zylinder_mass}" length="0.03" radius="0.05" ox="0.0" oy="-0.03" oz="-0.21" yaw="0.0" pitch="0.0" roll="0.0" color="WhiteGlow" />
+  <xacro:default_zylinder_in_Z parent="right_side_front_support" child_name="right_brush_zylinder" mass="${brush_zylinder_mass}" length="0.03" radius="0.05" ox="0.0" oy="0.03" oz="-0.21" yaw="0.0" pitch="0.0" roll="0.0" color="WhiteGlow" />
+  <xacro:default_zylinder_in_Z_with_collision parent="left_brush_zylinder" child_name="left_front_brush" mass="${front_brush_mass}" length="0.03" radius="0.06" ox="0.0" oy="0.0" oz="-0.03" yaw="0.0" pitch="0.0" roll="0.0" color="White" />
+  <xacro:default_zylinder_in_Z_with_collision parent="right_brush_zylinder" child_name="right_front_brush" mass="${front_brush_mass}" length="0.03" radius="0.06" ox="0.0" oy="0.0" oz="-0.03" yaw="0.0" pitch="0.0" roll="0.0" color="White" />
+
+  <xacro:default_box parent="front_frame_black" child_name="brush_support" mass="${brush_support_mass}" sizex="0.165" sizey="0.64" sizez="0.022" ox="-0.428" oy="0.0" oz="-0.04" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="brush_support" child_name="brush_left_support" mass="${brush_side_support_mass}" sizex="0.05" sizey="0.022" sizez="0.16" ox="0.0" oy="0.27" oz="-0.08" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="brush_support" child_name="brush_right_support" mass="${brush_side_support_mass}" sizex="0.05" sizey="0.022" sizez="0.16" ox="0.0" oy="-0.27" oz="-0.08" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_Y parent="brush_left_support" child_name="brush_left_zylinder" mass="${big_brush_zylinder_mass}" length="0.01" radius="0.025" ox="0.0" oy="-0.01" oz="-0.055" roll="${pi/2}" yaw="0.0" pitch="0.0" color="WhiteGlow" />
+  <xacro:default_zylinder_in_Y parent="brush_right_support" child_name="brush_right_zylinder" mass="${big_brush_zylinder_mass}" length="0.01" radius="0.025" ox="0.0" oy="0.01" oz="-0.055" roll="${pi/2}" yaw="0.0" pitch="0.0" color="WhiteGlow" />
+  <xacro:default_zylinder_in_Y_with_collision parent="brush_right_zylinder" child_name="brush" mass="${brush_mass}" length="0.52" radius="0.1" ox="0.0" oy="0.26" oz="0.0" roll="${pi/2}" yaw="0.0" pitch="0.0" color="WhiteGlow" /> -->
+
+  <!-- /////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Omnidirectional Wheels ////////////////////////// -->
+
+  <xacro:default_zylinder_in_Z parent="zylinder_base_support_left" child_name="zylinder_to_castor_left" mass="${zylinder_to_castor_mass}" length="0.35" radius="0.0175" ox="0.26" oy="0.0" oz="-0.04" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="zylinder_base_support_right" child_name="zylinder_to_castor_right" mass="${zylinder_to_castor_mass}" length="0.35" radius="0.0175" ox="0.26" oy="0.0" oz="-0.04" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="zylinder_to_castor_left" child_name="castor_plate_left" mass="${castor_plate_mass}" sizex="0.07" sizey="0.10" sizez="0.005" ox="0.0" oy="0.0" oz="-0.175" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="zylinder_to_castor_right" child_name="castor_plate_right" mass="${castor_plate_mass}" sizex="0.07" sizey="0.10" sizez="0.005" ox="0.0" oy="0.0" oz="-0.175" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="castor_plate_left" child_name="castor_support_leftleft" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_left" child_name="castor_support_rightleft" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="-0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_right" child_name="castor_support_leftright" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_right" child_name="castor_support_rightright" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="-0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_left" child_name="castor_leftleft" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="DarkGrey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_left" child_name="castor_rightleft" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="-0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_right" child_name="castor_leftright" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_right" child_name="castor_rightright" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="-0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="DarkGrey" />
+
+  <!-- //////////////////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Frame for Sonic Sensors ////////////////////////// -->
+
+  <!-- <xacro:default_box parent="left_side_bottom_support" child_name="sonic_frame_support_left" mass="0.9" sizex="1.19" sizey="0.037" sizez="0.037" ox="0.02" oy="0.0335" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Brown" />
+  <xacro:default_box parent="right_side_bottom_support" child_name="sonic_frame_support_right" mass="0.9" sizex="1.19" sizey="0.037" sizez="0.037" ox="0.02" oy="-0.0335" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Brown" />
+  <xacro:default_box parent="sonic_frame_support_left" child_name="sonic_frame_support_front" mass="0.5" sizex="0.037" sizey="0.735" sizez="0.037" ox="0.6135" oy="-0.349" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Brown" />
+  <xacro:default_box parent="sonic_frame_support_left" child_name="sonic_frame_support_rear" mass="0.5" sizex="0.037" sizey="0.735" sizez="0.037" ox="-0.6135" oy="-0.349" oz="0.0" yaw="0.0" pitch="0.0" roll="0.0" color="Brown" /> -->
+
+  <!-- ///////////////////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Actuators and Sensors ////////////////////////// -->
+  
+  <xacro:wheel_actuator parent="wheel_support_left" child_name="wheel_left" mass="${wheel_mass}" length="0.06" radius="${wheel_radius}" ox="0.0" oy="0.095" oz="0.0" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" axis_x="0" axis_y="1" axis_z="0" mu1="${mu1}" mu2="${mu2}" kp="${kp}" kd="${kd}" />
+  <xacro:wheel_actuator parent="wheel_support_right" child_name="wheel_right" mass="${wheel_mass}" length="0.06" radius="${wheel_radius}" ox="0.0" oy="-0.095" oz="0.0" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" axis_x="0" axis_y="1" axis_z="0" mu1="${mu1}" mu2="${mu2}" kp="${kp}" kd="${kd}" />
+
+  <!-- <xacro:distance_sensor_sonar prefix="US" sufix="FL_L_L" parent="sonic_frame_support_left" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.003" oy="0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FL_L_C" parent="sonic_frame_support_left" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.29" oy="0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FL_L_R" parent="sonic_frame_support_left" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.5425" oy="0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_R_R" parent="sonic_frame_support_right" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.003" oy="-0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${-pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_R_C" parent="sonic_frame_support_right" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.29" oy="-0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${-pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_R_L" parent="sonic_frame_support_right" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.5425" oy="-0.006" oz="0.0335" roll="0.0" pitch="0.0" yaw="${-pi/2}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+
+  <xacro:distance_sensor_sonar prefix="US" sufix="BL_B_R" parent="sonic_frame_support_rear" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="-0.006" oy="0.097" oz="0.0335" roll="0.0" pitch="0.0" yaw="${pi}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="BR_B_L" parent="sonic_frame_support_rear" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="-0.006" oy="-0.097" oz="0.0335" roll="0.0" pitch="0.0" yaw="${pi}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_F_A" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.03" sizez="0.055" ox="0.0" oy="-0.3475" oz="0.046" roll="0.0" pitch="0.0" yaw="${-pi/4}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_F_R" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.006" oy="-0.29" oz="0.0335" roll="0.0" pitch="0.0" yaw="0.0" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FR_F_L" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.006" oy="-0.09" oz="0.0335" roll="0.0" pitch="0.0" yaw="0.0" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+
+  <xacro:distance_sensor_sonar prefix="US" sufix="FL_F_A" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.03" sizez="0.055" ox="0.0" oy="0.3475" oz="0.046" roll="0.0" pitch="0.0" yaw="${pi/4}" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FL_F_L" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.006" oy="0.29" oz="0.0335" roll="0.0" pitch="0.0" yaw="0.0" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_sonar prefix="US" sufix="FL_F_R" parent="sonic_frame_support_front" mass="0.05" sizex="0.025" sizey="0.055" sizez="0.03" ox="0.006" oy="0.09" oz="0.0335" roll="0.0" pitch="0.0" yaw="0.0" vert_view="0.0" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" /> -->
+
+
+<!--
+  <xacro:distance_sensor_laser prefix="left_side" sufix="front" parent="left_side_bottom_support" mass="0.05" ox="0.05" oy="0.0" oz="0.0" hor_view="${pi/2}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right_side" sufix="front" parent="right_side_bottom_support" mass="0.05" ox="0.05" oy="0.0" oz="0.0" hor_view="${-pi/2}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="left_side" sufix="back" parent="left_side_bottom_support" mass="0.05" ox="-0.565" oy="0.0" oz="0.0" hor_view="${pi}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right_side" sufix="back" parent="right_side_bottom_support" mass="0.05" ox="-0.565" oy="0.0" oz="0.0" hor_view="${pi}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right" sufix="right" parent="soft_damper" mass="0.05" ox="0.0" oy="-0.315" oz="0.04" hor_view="${3*pi/2}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right" sufix="angle" parent="soft_damper" mass="0.05" ox="0.0" oy="-0.315" oz="0.07" hor_view="${7*pi/4}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right" sufix="front" parent="soft_damper" mass="0.05" ox="0.0" oy="-0.315" oz="0.10" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="left" sufix="right" parent="soft_damper" mass="0.05" ox="0.0" oy="0.315" oz="0.04" hor_view="${5*pi/2}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="left" sufix="angle" parent="soft_damper" mass="0.05" ox="0.0" oy="0.315" oz="0.07" hor_view="${pi/4}" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="left" sufix="front" parent="soft_damper" mass="0.05" ox="0.0" oy="0.315" oz="0.10" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="left" sufix="middle" parent="soft_damper" mass="0.05" ox="0.0" oy="0.10" oz="0.04" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+  <xacro:distance_sensor_laser prefix="right" sufix="middle" parent="soft_damper" mass="0.05" ox="0.0" oy="-0.10" oz="0.04" hor_view="0.0" update_rate="${dist_sensor_update_rate}" min_range="${dist_sensor_min_range}" max_range="${dist_sensor_max_range}" noise="${dist_sensor_noise}" />
+-->
+
+  <xacro:lidar_sensor parent="lidar_base" lidar_name="laser" length="${lidar_length}" radius="${lidar_radius}" mass="${lidar_mass}" ox="0.0" oy="0.0" oz="0.0325" update_rate="${lidar_update_rate}" min_angle="${lidar_min_angle}" max_angle="${lidar_max_angle}" min_range="${lidar_min_range}" max_range="${lidar_max_range}" range_resolution="${lidar_range_resolution}" stdv="${lidar_stdv}" />
+
+  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu_sensor" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" update_rateHz="${imu_update_rateHz}" noise="${imu_noise}" />
+
+  <!-- /////////////////////////////////////////////////////////////////////////// -->
+ <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <updateRate>50.0</updateRate>
+      <bodyName>base_link</bodyName>
+      <topicName>imu/data</topicName>
+      <accelDrift>0.005 0.005 0.005</accelDrift>
+      <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+      <rateDrift>0.005 0.005 0.005 </rateDrift>
+      <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+      <headingDrift>0.005</headingDrift>
+      <headingGaussianNoise>0.005</headingGaussianNoise>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <updateRate>40</updateRate>
+      <bodyName>base_link</bodyName>
+      <frameId>map</frameId>
+      <topicName>navsat/fix</topicName>
+      <velocityTopicName>navsat/vel</velocityTopicName>
+      <referenceLatitude>34.835190564394</referenceLatitude>
+      <referenceLongitude>137.45711512765206</referenceLongitude>
+      <referenceHeading>0</referenceHeading>
+      <referenceAltitude>0</referenceAltitude>
+      <drift>0.0001 0.0001 0.0001</drift>
+    </plugin>
+  </gazebo>
+
+</robot>
+

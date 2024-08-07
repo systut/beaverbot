@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<robot name="beaverbot" xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <xacro:property name="pi" value="3.14159" />
+  
+  <!-- /////////////////// size of robot parts /////////////////// -->
+  <xacro:property name="wheel_radius" value="0.164" />
+  <xacro:property name="wheel_seperation" value="0.53" />
+  <!-- /////////////////////////////////////////////////////////// -->
+  
+  <!-- /////////////////// mass of robot parts /////////////////// -->
+  <xacro:property name="base_mass" value="30.0" />                  <!-- updated -->
+  <xacro:property name="base_support_frame_mass" value="0.415" />   <!-- updated -->
+  <xacro:property name="zylinder_base_support_mass" value="1.08" /> <!-- updated -->
+  <xacro:property name="support_link_mass" value="0.415" />         <!-- updated -->
+  <xacro:property name="wheel_support_mass" value="11.5" />         <!-- updated -->
+  <xacro:property name="wheel_mass" value="4.0" />                  <!-- updated -->
+  
+  <xacro:property name="lidar_base_mass" value="0.2" />             <!-- updated -->
+  <xacro:property name="front_light_mass" value="0.05" />           <!-- updated -->
+  <xacro:property name="back_light_mass" value="0.1" />             <!-- updated -->
+
+  <xacro:property name="zylinder_to_castor_mass" value="0.725" />   <!-- updated -->
+  <xacro:property name="castor_plate_mass" value="0.12" />          <!-- updated -->
+  <xacro:property name="castor_support_mass" value="0.1" />         <!-- updated -->
+  <xacro:property name="castor_mass" value="0.3" />                 <!-- updated -->
+  
+  <xacro:property name="top_support_mass" value="0.65" />           <!-- updated -->
+  <xacro:property name="top_frame_yellow_mass" value="1.5" />       <!-- updated -->
+  <xacro:property name="top_frame_black_mass" value="1.8" />        <!-- updated -->
+  <xacro:property name="front_frame_black_mass" value="2.0" />      <!-- updated -->
+  
+  <xacro:property name="long_zylinder_mass" value="1.17" />         <!-- updated -->
+  <xacro:property name="short_zylinder_mass" value="0.415" />       <!-- updated -->
+
+
+  <!-- /////////////////////////////////////////////////////////// -->
+  
+  <!-- /////////////////// sensor specifications /////////////////// -->
+  <xacro:property name="dist_size" value="0.03" />
+  <xacro:property name="dist_sensor_update_rate" value="40.0" />	<!-- update rate in ms or in Hz??? -->
+  <xacro:property name="dist_sensor_min_range" value="0.10" />
+  <xacro:property name="dist_sensor_max_range" value="3.00" />
+  <xacro:property name="dist_sensor_noise" value="0.01" />
+  
+  <xacro:property name="lidar_update_rate" value="10.0" />			<!-- update rate in ms or in Hz??? -->
+  <xacro:property name="lidar_mass" value="0.3" />
+  <xacro:property name="lidar_length" value="0.04" />
+  <xacro:property name="lidar_radius" value="0.0325" />
+  <xacro:property name="lidar_min_range" value="0.15" />
+  <xacro:property name="lidar_max_range" value="8.0" />
+  <xacro:property name="lidar_stdv" value="0.01" />
+  <xacro:property name="lidar_range_resolution" value="0.01" />
+  <xacro:property name="lidar_min_angle" value="0.0" />
+  <xacro:property name="lidar_max_angle" value="6.283185" />
+  
+  <xacro:property name="imu_update_rate" value="25.0" />			<!-- update rate in ms -->
+  <xacro:property name="imu_update_rateHz" value="40.0" />
+  <xacro:property name="imu_mass" value="0.05" />
+  <xacro:property name="imu_noise" value="0.001" />
+  
+  <xacro:property name="mu1" value="0.6" />
+  <xacro:property name="mu2" value="0.6" />
+  <xacro:property name="kp" value="10000000.0" />
+  <xacro:property name="kd" value="40.0" />
+  <!-- ///////////////////////////////////////////////////////////// -->
+  
+</robot>
