@@ -1,7 +1,7 @@
 FROM osrf/ros:noetic-desktop-full
 
 # copy install scripts
-COPY ./nitrabot_dockerfiles/install /root/install
+COPY ./beaverbot_dockerfiles/install /root/install
 
 # update and install dependencies
 RUN chmod +x /root/install/*
@@ -25,7 +25,7 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y
 
 # Build ROS packages
-RUN catkin config --skiplist nitrabot_communication
+RUN catkin config --skiplist beaverbot_communication
 
 RUN . /opt/ros/noetic/setup.bash && \
     catkin build && \

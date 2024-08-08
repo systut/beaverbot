@@ -25,7 +25,7 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y
 
 # Build ROS packages
-RUN catkin config --skiplist nitrabot_communication
+RUN catkin config --skiplist beaverbot_communication
 
 RUN . /opt/ros/noetic/setup.bash && \
     catkin build && \

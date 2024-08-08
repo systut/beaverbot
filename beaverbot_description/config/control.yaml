@@ -1,8 +1,8 @@
-nitrabot_joint_publisher:
+beaverbot_joint_publisher:
   type: "joint_state_controller/JointStateController"
   publish_rate: 50
 
-nitrabot_velocity_controller:
+beaverbot_diff_drive_controller:
   type: "diff_drive_controller/DiffDriveController"
   left_wheel: ['wheel_support_left_to_wheel_left']
   right_wheel: ['wheel_support_right_to_wheel_right']

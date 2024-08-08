@@ -14,7 +14,7 @@ services:
     image: beaverbot:noetic
     build:
       context: ..
-      dockerfile: ./nitrabot_dockerfiles/Dockerfile
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile
     container_name: beaverbot
     volumes:
       - "../:/root/catkin_ws/src/"
@@ -37,7 +37,7 @@ services:
     image: beaverbot:melodic
     build:
       context: ..
-      dockerfile: ./nitrabot_dockerfiles/Dockerfile.melodic
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
     container_name: beaverbot_communication
     privileged: True
     network_mode: host
