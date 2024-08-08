@@ -1,0 +1,66 @@
+FROM osrf/ros:noetic-desktop-full
+
+# copy install scripts
+COPY ./nitrabot_dockerfiles/install /root/install
+
+# update and install dependencies
+RUN chmod +x /root/install/*
+
+RUN /bin/sh -e -c /root/install/i_dep.sh
+
+# copy directory specific to scart
+COPY ./ /root/catkin_ws/src/
+
+# set default bash shell
+SHELL ["/bin/bash", "-c"]
+
+# set environment variable for ros
+RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
+
+# install ros dependencies
+WORKDIR /root/catkin_ws 
+
+RUN rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y
+
+# Build ROS packages
+RUN catkin config --skiplist nitrabot_communication
+
+RUN . /opt/ros/noetic/setup.bash && \
+    catkin build && \
+    echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc
+
+# Indicates docker image
+FROM osrf/ros:noetic-desktop-full 
+
+# Configure environment
+ENV DISPLAY host.docker.internal:0.0
+
+# Listens to port
+EXPOSE 8080
+EXPOSE 9090
+
+RUN apt-get update && \
+    apt-get install -y x11-apps
+
+# Copy files
+COPY ./ /root/catkin_ws/src/
+
+COPY ./beaverbot_dockerfiles/install /root/install
+
+# Run dependencies installation
+RUN chmod +x /root/install/*
+RUN sed -i -e 's/\r$//' /root/install/i_dep.sh
+RUN /bin/sh -e -c /root/install/i_dep.sh
+
+# Set default bash shell
+SHELL ["/bin/bash", "-c"]
+
+# Set start up directory
+WORKDIR /root/catkin_ws
+
+# Set environment variables (for using commands)
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc

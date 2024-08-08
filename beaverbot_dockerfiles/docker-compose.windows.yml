@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  ros-master:
+    image: ros:noetic-ros-core
+    container_name: ros-master
+    command: stdbuf -o L roscore
+    network_mode: host
+    
+  beaverbot:
+    user: root
+    depends_on: 
+      - ros-master
+    image: beaverbot:windows
+    build:
+      context: ..
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile.windows
+    container_name: beaverbot
+    volumes:
+      - "../:/root/catkin_ws/src/"
+    privileged: True
+    network_mode: host
+    tty: True
+    stdin_open: True
+    command: bash
