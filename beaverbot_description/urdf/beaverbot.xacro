@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<robot name="beaverbot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- ////////////////////////////INERTIA DEFINITIONS//////////////////////////// -->
+  <!-- based on the inertia list from wikipedia -->
+
+  <xacro:macro name="inertial_zylinder_x" params="mass radius height">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="${(mass/2)*radius*radius}" ixy="0.0" ixz="0.0" iyy="${(mass/12)*(3*radius*radius+height*height)}" iyz="0.0" izz="${(mass/12)*(3*radius*radius+height*height)}" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="inertial_zylinder_y" params="mass radius height">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="${(mass/12)*(3*radius*radius+height*height)}" ixy="0.0" ixz="0.0" iyy="${(mass/2)*radius*radius}" iyz="0.0" izz="${(mass/12)*(3*radius*radius+height*height)}" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="inertial_zylinder_z" params="mass radius height">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="${(mass/12)*(3*radius*radius+height*height)}" ixy="0.0" ixz="0.0" iyy="${(mass/12)*(3*radius*radius+height*height)}" iyz="0.0" izz="${(mass/2)*radius*radius}" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="inertial_box" params="mass x y z">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="${(mass/12)*(y*y+z*z)}" ixy="0.0" ixz="0.0" iyy="${(mass/12)*(x*x+z*z)}" iyz="0.0" izz="${(mass/12)*(y*y+x*x)}" />
+    </inertial>
+  </xacro:macro>
+
+  <!-- ////////////////////////////////////////////////////////////////////////////// -->
+  
+  <!-- //////////////////////////// Robot xacros //////////////////////////// -->
+    
+  <xacro:macro name="default_box" params="parent child_name mass sizex sizey sizez ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <box size="${sizex} ${sizey} ${sizez}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_X" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <xacro:inertial_zylinder_x mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_Y" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <xacro:inertial_zylinder_y mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_Z" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <xacro:inertial_zylinder_z mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <!-- ////////////////////////////////////////////////////////////////////// -->
+  
+  <!-- //////////////////////////// Robot xacros with collision //////////////////////////// -->
+  
+  <xacro:macro name="default_box_with_collision" params="parent child_name mass sizex sizey sizez ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <box size="${sizex} ${sizey} ${sizez}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${sizex} ${sizey} ${sizez}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+      </collision>
+      <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_X_with_collision" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+      </collision>
+      <xacro:inertial_zylinder_x mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_Y_with_collision" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+      </collision>
+      <xacro:inertial_zylinder_y mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="default_zylinder_in_Z_with_collision" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+    <link name="${child_name}" >
+      <visual>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+        <material name="${color}" />
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${length}" radius="${radius}" />
+        </geometry>
+        <origin rpy="${roll} ${pitch} ${yaw}" />
+      </collision>
+      <xacro:inertial_zylinder_z mass="${mass}" radius="${radius}" height="${length}" />
+    </link>
+    <gazebo reference="${child_name}" >
+      <material>Gazebo/${color}</material>
+    </gazebo>
+    <joint name="${parent}_to_${child_name}" type="fixed">
+      <parent link="${parent}" />
+      <child link="${child_name}" />
+      <origin xyz="${ox} ${oy} ${oz}" />
+    </joint>
+  </xacro:macro>
+
+  <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+
+</robot>

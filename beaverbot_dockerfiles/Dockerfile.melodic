@@ -1,0 +1,26 @@
+FROM osrf/ros:melodic-desktop-full 
+
+# copy install scripts
+RUN apt-get update && \
+    apt install -y libserial-dev python-catkin-tools
+
+# copy directory specific to scart
+COPY ./beaverbot_communication /root/catkin_ws/src/beaverbot_communication
+
+# set default bash shell
+SHELL ["/bin/bash", "-c"]
+
+# set environment variable for ros
+RUN echo "source /opt/ros/melodic/setup.bash" >> /root/.bashrc
+RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
+
+# install ros dependencies
+WORKDIR /root/catkin_ws 
+
+RUN rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y
+
+# Build ROS packages
+RUN . /opt/ros/melodic/setup.bash && \
+    catkin build && \
+    echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc

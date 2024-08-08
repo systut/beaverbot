@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<robot name="beaverbot" xmlns:xacro="http://ros.org/wiki/xacro">
+	
+  <!-- Import all robot parts which were xacroed -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/beaverbot.xacro" />
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/colors.xacro" />
+  <!-- Import robot properties -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/properties.xacro" />
+  <!-- Import sensor and actuator properties -->
+  <xacro:include filename="$(find beaverbot_description)/urdf/sensors_and_actuators.xacro" />
+  <xacro:arg name="robot_namespace" default="/" />
+
+  <!--<link name="world"/>-->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.24 0.74 0.46"/>	<!-- rough robot size: x=1.24 y=0.74 z=0.46 -->
+      </geometry>
+      <origin rpy="0 0 0" xyz="0.395 0.0 0.12"/>
+    </collision>
+    <!--<xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" />-->
+  </link>
+  <gazebo reference="base_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <link name="base">
+    <visual>
+      <geometry>
+        <box size="0.52 0.21 0.21"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+    <xacro:inertial_box mass="${base_mass}" x="0.52" y="0.21" z="0.21" />
+  </link>
+  <gazebo reference="base">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <joint name="base_link_to_base" type="fixed">
+    <parent link="base_link"/>
+    <child link="base"/>
+    <origin xyz="0.11 0.0 0.061" />
+  </joint>
+
+  <link name="robot_center">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01" />
+      </geometry>
+      <material name="Red"/>
+    </visual>
+  </link>
+  <gazebo reference="robot_center">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <joint name="base_link_to_robot_center" type="fixed">
+    <parent link="base_link"/>
+    <child link="robot_center"/>
+    <origin xyz="0.415 0.0 0.0" />
+  </joint>
+
+  <!-- ////////////////////////// Base Link and Wheel Connections and Links ////////////////////////// -->
+
+  <xacro:default_box parent="base" child_name="back_base_support_frame" mass="${base_support_frame_mass}" sizex="0.05" sizey="0.40" sizez="0.02" ox="-0.11" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="base" child_name="front_base_support_frame" mass="${base_support_frame_mass}" sizex="0.05" sizey="0.40" sizez="0.02" ox="0.11" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_X parent="back_base_support_frame" child_name="zylinder_base_support_left" mass="${zylinder_base_support_mass}" length="0.52" radius="0.0175" ox="0.11" oy="0.2" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_X parent="back_base_support_frame" child_name="zylinder_base_support_right" mass="${zylinder_base_support_mass}" length="0.52" radius="0.0175" ox="0.11" oy="-0.2" oz="0.0" yaw="0.0" pitch="${pi/2}" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="base" child_name="support_link" mass="${support_link_mass}" sizex="0.022" sizey="0.4" sizez="0.022" ox="0.26" oy="0.0" oz="0.105" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_zylinder_in_Y parent="base" child_name="wheel_support_left" mass="${wheel_support_mass}" length="0.13" radius="0.05" ox="-0.11" oy="0.155" oz="-0.061" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Black" />
+  <xacro:default_zylinder_in_Y parent="base" child_name="wheel_support_right" mass="${wheel_support_mass}" length="0.13" radius="0.05" ox="-0.11" oy="-0.155" oz="-0.061" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_Z parent="top_support" child_name="lidar_base" mass="${lidar_base_mass}" length="0.025" radius="0.025" ox="0.01" oy="0.0" oz="0.015" roll="0.0" yaw="0.0" pitch="0.0" color="Black" />
+
+  <!-- <xacro:default_zylinder_in_Z parent="front_frame_black" child_name="front_light_left" mass="${front_light_mass}" length="0.005" radius="0.025" ox="0.001" oy="0.175" oz="0.12" roll="0.0" pitch="${pi/2}" yaw="0.0" color="White" />
+  <xacro:default_zylinder_in_Z parent="front_frame_black" child_name="front_light_right" mass="${front_light_mass}" length="0.005" radius="0.025" ox="0.001" oy="-0.175" oz="0.12" roll="0.0" pitch="${pi/2}" yaw="0.0" color="White" /> -->
+
+  <xacro:default_box parent="base" child_name="back_light" mass="${back_light_mass}" sizex="0.005" sizey="0.1" sizez="0.04" ox="-0.26" oy="0.0" oz="0.055" yaw="0.0" pitch="0.0" roll="0.0" color="Red" />
+
+  <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+  
+  <!-- ////////////////////////// Outer frame with Links and Plates ////////////////////////// -->
+
+  <xacro:default_box parent="base" child_name="top_support" mass="${top_support_mass}" sizex="0.022" sizey="0.63" sizez="0.022" ox="0.26" oy="0.0" oz="0.245" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Omnidirectional Wheels ////////////////////////// -->
+
+  <xacro:default_zylinder_in_Z parent="zylinder_base_support_left" child_name="zylinder_to_castor_left" mass="${zylinder_to_castor_mass}" length="0.35" radius="0.0175" ox="0.26" oy="0.0" oz="-0.04" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_zylinder_in_Z parent="zylinder_base_support_right" child_name="zylinder_to_castor_right" mass="${zylinder_to_castor_mass}" length="0.35" radius="0.0175" ox="0.26" oy="0.0" oz="-0.04" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="zylinder_to_castor_left" child_name="castor_plate_left" mass="${castor_plate_mass}" sizex="0.07" sizey="0.10" sizez="0.005" ox="0.0" oy="0.0" oz="-0.175" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="zylinder_to_castor_right" child_name="castor_plate_right" mass="${castor_plate_mass}" sizex="0.07" sizey="0.10" sizez="0.005" ox="0.0" oy="0.0" oz="-0.175" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  
+  <xacro:default_box parent="castor_plate_left" child_name="castor_support_leftleft" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_left" child_name="castor_support_rightleft" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="-0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_right" child_name="castor_support_leftright" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+  <xacro:default_box parent="castor_plate_right" child_name="castor_support_rightright" mass="${castor_support_mass}" sizex="0.03" sizey="0.005" sizez="0.09" ox="0.0" oy="-0.0475" oz="-0.045" yaw="0.0" pitch="0.0" roll="0.0" color="Black" />
+
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_left" child_name="castor_leftleft" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_left" child_name="castor_rightleft" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="-0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_right" child_name="castor_leftright" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+  <xacro:default_zylinder_in_Y_with_collision parent="castor_plate_right" child_name="castor_rightright" mass="${castor_mass}" length="0.045" radius="0.04" ox="0.0" oy="-0.0225" oz="-0.075" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" />
+
+  <!-- //////////////////////////////////////////////////////////////////////////// -->
+
+  <!-- ////////////////////////// Actuators and Sensors ////////////////////////// -->
+  
+  <xacro:wheel_actuator parent="wheel_support_left" child_name="wheel_left" mass="${wheel_mass}" length="0.06" radius="${wheel_radius}" ox="0.0" oy="0.095" oz="0.0" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" axis_x="0" axis_y="1" axis_z="0" mu1="${mu1}" mu2="${mu2}" kp="${kp}" kd="${kd}" />
+  <xacro:wheel_actuator parent="wheel_support_right" child_name="wheel_right" mass="${wheel_mass}" length="0.06" radius="${wheel_radius}" ox="0.0" oy="-0.095" oz="0.0" roll="${pi/2}" yaw="0.0" pitch="0.0" color="Grey" axis_x="0" axis_y="1" axis_z="0" mu1="${mu1}" mu2="${mu2}" kp="${kp}" kd="${kd}" />
+
+  <xacro:lidar_sensor parent="lidar_base" lidar_name="laser" length="${lidar_length}" radius="${lidar_radius}" mass="${lidar_mass}" ox="0.0" oy="0.0" oz="0.0325" update_rate="${lidar_update_rate}" min_angle="${lidar_min_angle}" max_angle="${lidar_max_angle}" min_range="${lidar_min_range}" max_range="${lidar_max_range}" range_resolution="${lidar_range_resolution}" stdv="${lidar_stdv}" />
+
+  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu_sensor" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" update_rateHz="${imu_update_rateHz}" noise="${imu_noise}" />
+
+  <!-- /////////////////////////////////////////////////////////////////////////// -->
+ <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <updateRate>50.0</updateRate>
+      <bodyName>base_link</bodyName>
+      <topicName>imu/data</topicName>
+      <accelDrift>0.005 0.005 0.005</accelDrift>
+      <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+      <rateDrift>0.005 0.005 0.005 </rateDrift>
+      <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+      <headingDrift>0.005</headingDrift>
+      <headingGaussianNoise>0.005</headingGaussianNoise>
+    </plugin>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <updateRate>40</updateRate>
+      <bodyName>base_link</bodyName>
+      <frameId>map</frameId>
+      <topicName>navsat/fix</topicName>
+      <velocityTopicName>navsat/vel</velocityTopicName>
+      <referenceLatitude>34.835190564394</referenceLatitude>
+      <referenceLongitude>137.45711512765206</referenceLongitude>
+      <referenceHeading>0</referenceHeading>
+      <referenceAltitude>0</referenceAltitude>
+      <drift>0.0001 0.0001 0.0001</drift>
+    </plugin>
+  </gazebo>
+
+</robot>
+

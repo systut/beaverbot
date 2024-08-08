@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>beaverbot_launch</name>
+  <version>0.0.0</version>
+  <description>The beaverbot_launch package</description>
+
+  <maintainer email="tran.viet.thanh.du@tut.jp">Tran Thanh</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+
+  </export>
+</package>
