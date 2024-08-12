@@ -64,7 +64,7 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
 
 ## Software configuration 
 
-![software configuration](.github/images/nitrabot_software_configuration.jpg)
+![software configuration](.github/images/beaverbot_software_configuration.jpg)
 
 ### Localization & Mapping
 
