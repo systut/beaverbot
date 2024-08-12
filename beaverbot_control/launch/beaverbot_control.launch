@@ -1,0 +1,8 @@
+<launch>
+    <node name="beaverbot_control_node" pkg="beaverbot_control" type="beaverbot_control_node" output="screen">
+        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/global_trajectory.csv"/>
+        <param name="~sampling_time" value="0.05"/>
+        <param name="~controller_type" value="feedforward"/>
+        <param name="~is_derivative" value="true"/>
+    </node>
+</launch>
