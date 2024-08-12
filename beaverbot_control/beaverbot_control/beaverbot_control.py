@@ -105,7 +105,7 @@ class BeaverbotControl(object):
         """! Register publisher
         """
         self._velocity_publisher = rospy.Publisher(
-            "/beaverbot_diff_drive_controller/cmd_vel",
+            "/cmd_vel",
             Twist, queue_size=10)
 
     def _register_timers(self):
