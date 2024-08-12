@@ -27,7 +27,7 @@ This workspace is partially written by TUT-Systems Engneering Labroratory member
 
 ## Hardware Configuration
 
-![hardware configuration](.github/images/nitrabot_hardware_configuration.jpg)
+![hardware configuration](.github/images/beaverbot_hardware_configuration.jpg)
 
 
 ### GNSS device
@@ -59,7 +59,7 @@ An Intertial Measurement Unit (IMU) measures and reports body's specific force (
 
 Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is based on two separately driven wheels placed on either side of the robot body. Velocity commands could be sent to robot via the interface device using serial communication.
 
- [robot_communication](src/nitrabot_communication/src/nitrabot_communication/robot_communication.cpp) node in [nitrabot_communication](src/nitrabot_communication/) package is responsible for commucating with the robot. The velocity command published on `/cmd_vel` topic will be sent to the robot via interface devices. Concurrently, the rotary encoder data and battery's condition also be published respectively into `/encoder` and `/battery` topics.
+ [robot_communication](src/beaverbot_communication/src/beaverbot_communication/robot_communication.cpp) node in [beaverbot_communication](src/beaverbot_communication/) package is responsible for commucating with the robot. The velocity command published on `/cmd_vel` topic will be sent to the robot via interface devices. Concurrently, the rotary encoder data and battery's condition also be published respectively into `/encoder` and `/battery` topics.
 
 
 ## Software configuration 
@@ -96,7 +96,7 @@ Make a X authentication file with proper permissions for the container to use.
 
 ```bash
 # If not working, try to run "sudo rm -rf /tmp/.docker.xauth" first
-cd ./src/nitrabot_dockerfiles/
+cd ./src/beaverbot_dockerfiles/
 chmod +x ./install/xauth.sh && ./install/xauth.sh
 ```
 
@@ -109,13 +109,13 @@ chmod +x ./src/docker_installer.sh && ./src/install_docker.sh
   
 Start up
 ```bash
-cd ./src/nitrabot_dockerfiles
+cd ./src/beaverbot_dockerfiles
 docker compose up -d 
 ```
 
 Open a container in interactive mode
 ```bash
-cd ./src/nitrabot_dockerfiles
+cd ./src/beaverbot_dockerfiles
 docker compose exec [name-of-container] bash
 ```
 To stop containers, run
@@ -144,14 +144,14 @@ In terminal 1, run the below to enable sending command to robot and get the whee
 
 ```bash
 docker compose exec robot_communication bash
-roslaunch nitrabot_communication nitrabot_communication.launch
+roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2, run the below to start collect GPS and IMU sensor data
 
 ```bash
 docker compose exec nitra_robot bash
-roslaunch nitrabot_launch bringup.launch
+roslaunch beaverbot_launch bringup.launch
 ```
 
 ### Scenario 1: Feedforward control
@@ -163,13 +163,13 @@ In terminal 1
 ```bash
 docker compose up -d 
 docker compose exec robot_communication bash
-roslaunch nitrabot_communication nitrabot_communication.launch
+roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 In terminal 2
 
 ```bash
 docker compose exec nitra_robot bash
-rosrun nitrabot_control feedforward
+rosrun beaverbot_control feedforward
 ```
 
 ### Scenario 2: Feedback control with pure pursuit controller
@@ -181,12 +181,12 @@ In terminal 1
 ```bash
 docker compose up -d 
 docker compose exec robot_communication bash
-roslaunch nitrabot_communication nitrabot_communication.launch
+roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2
 
 ```bash
 docker compose exec nitra_robot bash
-roslaunch nitrabot_launch nav_pure_pursuit.launch
+roslaunch beaverbot_launch nav_pure_pursuit.launch
 ```
