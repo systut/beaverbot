@@ -146,12 +146,14 @@ class Calibrate(object):
         @return Bearing
         """
         first_latitude = math.radians(self._poses[0].latitude)
+
         second_latitude = math.radians(self._poses[1].latitude)
 
         difference_longitude = math.radians(
             self._poses[1].longitude - self._poses[0].longitude)
 
         x = math.sin(difference_longitude) * math.cos(second_latitude)
+        
         y = math.cos(first_latitude) * math.sin(second_latitude)
         - (math.sin(first_latitude)
            * math.cos(second_latitude) * math.cos(difference_longitude))
