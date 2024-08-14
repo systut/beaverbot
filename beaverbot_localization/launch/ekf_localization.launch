@@ -1,0 +1,35 @@
+<launch>
+  <!-- play bag file -->
+  <param name="use_sim_time" value="false"/>
+  <arg name="debug" value="false"/>
+  
+  <node if="$(arg debug)" pkg="rosbag" type="play" name="player" output="screen" args="--clock /root/catkin_ws/sensor_data.bag"/>
+  
+  <!-- Start node that publish the transfrom from /base_link to /odom -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_local" clear_params="true">
+    <rosparam command="load" file="$(find nitrabot_localization)/config/ekf_local_params.yaml"/>
+    <remap from="/odometry/filtered" to="/odometry/filtered/local"/>
+  </node>
+
+  <!-- Start node that publish the transfrom from /odom to /map -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_global" clear_params="true">
+    <rosparam command="load" file="$(find nitrabot_localization)/config/ekf_global_params.yaml"/>
+    <remap from="/odometry/filtered/" to="/odometry/filtered/global"/>
+  </node>
+
+  <!-- Start node that transform GPS data into Odometry data in a frame that is consistent with robot's world frame -->
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true">
+    <rosparam command="load" file="$(find nitrabot_localization)/config/navsat_transform_params.yaml"/>
+    <remap from="/gps/fix" to="/fix"/>
+    <remap from="/odometry/filtered" to="/odometry/filtered/global"/>
+  </node>
+
+  <!-- Pubish required transforms for revelant frames -->
+  <node name="imu_frame_pub" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 base_link imu_link"/>  
+  <node name="gps_frame_pub" pkg="tf2_ros" type="static_transform_publisher" args="0 0 0 0 0 0 1 base_link gps"/>
+
+  <!-- Rviz -->
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find nitrabot_localization)/config/tf_view.rviz" />
+
+  
+</launch>
