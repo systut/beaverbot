@@ -33,3 +33,4 @@ apt-get autoremove -y
 apt-get clean -y
 python3 -m pip install $python_dep
 python3 -m pip install setuptools --upgrade
+python3 -m pip install importlib_metadata --force-reinstall
