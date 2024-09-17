@@ -15,9 +15,9 @@ from scipy.spatial.transform import Rotation
 
 # External library
 import rospy
-from geometry_msgs.msg import Twist
 from sensor_msgs.msg import NavSatFix
 from robot_localization.srv import SetDatum
+from geometry_msgs.msg import Twist, Quaternion
 from geographic_msgs.msg import GeoPose, GeoPoint
 
 
@@ -52,6 +52,8 @@ class Calibrate(object):
 
         self._move_robot(0.1)
 
+        self._move_robot(0.0)
+
         self._retrieve_gps_data()
 
         msg = self._calculate_datum()
@@ -59,6 +61,8 @@ class Calibrate(object):
         self._datum_client(msg)
 
         self._move_robot(-0.1)
+
+        self._move_robot(0.0)
 
     # ==================================================================================================
     # PRIVATE METHODS
@@ -103,7 +107,7 @@ class Calibrate(object):
         @param linear_velocity Linear velocity
         """
         rospy.loginfo("Move robot")
-        for _ in range(10):
+        for _ in range(50):
             msg = Twist()
 
             msg.linear.x = linear_velocity
@@ -117,7 +121,9 @@ class Calibrate(object):
         """
         bearing = self._calculate_bearing()
 
-        orientation = Rotation.from_euler('z', bearing).to_quaternion()
+        orientation = Rotation.from_euler('z', bearing).as_quat()
+
+        orientation = Quaternion(*list(orientation))
 
         return GeoPose(position=GeoPoint(
             latitude=self._poses[0].latitude,
