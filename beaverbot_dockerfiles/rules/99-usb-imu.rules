@@ -1,1 +1,1 @@
-SUBSYSTEM=="video4linux", ENV{ID_V4L_PRODUCT}=="mmal service 16.1", SYMLINK+="imu", MODE="0666"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2b72", ATTRS{serial}=="9AXIS-00", SYMLINK+="imu", MODE="0666"
