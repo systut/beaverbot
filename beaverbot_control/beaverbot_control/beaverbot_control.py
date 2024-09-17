@@ -99,13 +99,13 @@ class BeaverbotControl(object):
     def _register_subscribers(self):
         """! Register subscriber
         """
-        rospy.Subscriber("odom", Odometry, self._odom_callback)
+        rospy.Subscriber("odometry/filtered/global", Odometry, self._odom_callback)
 
     def _register_publishers(self):
         """! Register publisher
         """
         self._velocity_publisher = rospy.Publisher(
-            "/cmd_vel",
+            "cmd_vel",
             Twist, queue_size=10)
 
     def _register_timers(self):
@@ -126,7 +126,7 @@ class BeaverbotControl(object):
         """! Timer callback
         @param event<Event>: The event
         """
-        if not self._state and self._controller in ["pure_pursuit"]:
+        if not self._state and self._controller_type in ["pure_pursuit"]:
             rospy.logwarn("No current status of the vehicle")
 
             return
@@ -144,6 +144,8 @@ class BeaverbotControl(object):
             return
 
         msg = self._convert_control_input_to_msg(u)
+
+        rospy.loginfo(f"Send control input {msg}")
 
         self._velocity_publisher.publish(msg)
 

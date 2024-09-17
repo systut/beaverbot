@@ -22,7 +22,7 @@ class PurePursuit:
     autonomous driving.
     """
 
-    lookahead_distance = 2.0
+    lookahead_distance = 0.5
 
     lookahead_gain = 0.1
 
@@ -58,7 +58,7 @@ class PurePursuit:
             - state[2]
         )
 
-        v = 5.0
+        v = 0.2
 
         w = v * 2.0 * math.sin(alpha) / lookahead_distance
 
@@ -109,12 +109,7 @@ class PurePursuit:
 
             self.old_nearest_point_index = index
 
-        v = (input[0] + input[1]) / 2
-
-        lookahead_distance = (
-            PurePursuit.lookahead_gain * v
-            + PurePursuit.lookahead_distance
-        )
+        lookahead_distance = PurePursuit.lookahead_distance
 
         distance = self._calculate_distance(self.trajectory.x[index], state)
 
