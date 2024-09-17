@@ -4,4 +4,4 @@ zero_altitude: true
 publish_filtered_gps: false
 use_odometry_yaw: true
 wait_for_datum: true
-datum: [34.70242965166667, 137.40894646333334, -1.58]
+datum: [34.70242965166667, 137.40894646333334, -1.57, map, base_link]
