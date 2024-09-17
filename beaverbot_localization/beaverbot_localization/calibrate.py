@@ -88,29 +88,13 @@ class Calibrate(object):
         self._cmd_vel_publisher = rospy.Publisher(
             "/cmd_vel", Twist, queue_size=10)
 
-    def _register_subscribers(self):
-        """! Register subscribers
-        """
-        _ = rospy.Subscriber(
-            "/fix", NavSatFix, self._gps_callback)
-
-    def _gps_callback(self, msg):
-        """! GPS callback
-        """
-        self._gps_msg = msg
-
     def _retrieve_gps_data(self):
         """! Retrieve GPS data
         """
         while not rospy.is_shutdown():
-            if not self._gps_msg:
-                rospy.logwarn("No GPS message received")
+            gps_msg = rospy.wait_for_message("/fix", NavSatFix, timeout=None)
 
-                rospy.spin_once()
-
-                continue
-
-            self._poses.append(self._gps_msg)
+            self._poses.append(gps_msg)
 
             break
 
