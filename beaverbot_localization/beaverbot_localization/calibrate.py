@@ -17,7 +17,7 @@ from scipy.spatial.transform import Rotation
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import NavSatFix
-from robot_localization.srv import Datum
+from robot_localization.srv import SetDatum
 from geographic_msgs.msg import GeoPose, GeoPoint
 
 
@@ -39,6 +39,8 @@ class Calibrate(object):
         self._read_parameters()
 
         self._register_clients()
+
+        self._register_publishers()
 
         self._poses = []
 
@@ -69,16 +71,13 @@ class Calibrate(object):
     def _register_clients(self):
         """! Register controllers
         """
-        self._datum_client = rospy.ServiceProxy(
-            "/datum", Datum)
-
         try:
-            rospy.loginfo("Waiting for service 'detect' to appear..")
+            rospy.loginfo("Waiting for service 'datum' to appear..")
 
             rospy.wait_for_service('datum', timeout=5.0)
 
             self._datum_client = rospy.ServiceProxy(
-                "datum", Datum)
+                "datum", SetDatum)
 
         except Exception as exception:
             rospy.logerr(exception)
@@ -107,7 +106,7 @@ class Calibrate(object):
             if not self._gps_msg:
                 rospy.logwarn("No GPS message received")
 
-                rospy.spin()
+                rospy.spin_once()
 
                 continue
 
@@ -119,6 +118,7 @@ class Calibrate(object):
         """! Move robot
         @param linear_velocity Linear velocity
         """
+        rospy.loginfo("Move robot")
         for _ in range(10):
             msg = Twist()
 

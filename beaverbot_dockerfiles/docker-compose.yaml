@@ -20,6 +20,7 @@ services:
       - "../:/root/catkin_ws/src/"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - "/tmp/.docker.xauth:/tmp/.docker.xauth"
+      - "/dev:/dev"
     environment:
       - "DISPLAY=$DISPLAY"
       - "XAUTHORITY=/tmp/.docker.xauth"
@@ -43,4 +44,14 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    command: bash
+    volumes:
+      - "/dev:/dev"
+    entrypoint:
+      - bash 
+      - -c
+    command: > 
+      "source /opt/ros/melodic/setup.bash &&
+      source /root/catkin_ws/devel/setup.bash &&
+      sleep 2 &&
+      roslaunch beaverbot_driver beaverbot_driver.launch"
+

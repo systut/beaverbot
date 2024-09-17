@@ -23,8 +23,9 @@ ros_dep="ros-noetic-tf \
          ros-noetic-navigation"
 
 python_dep="rospy-message-converter \
-         python-socketio
-         python-socketio[client]"
+         python-socketio  \
+         python-socketio[client] \
+         scipy"
 
 apt-get update
 apt-get upgrade -y

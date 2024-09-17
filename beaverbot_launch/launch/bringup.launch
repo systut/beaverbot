@@ -3,11 +3,6 @@
     <arg name="gnss_port" default="/dev/gps" />
     <arg name="imu_port" default="/dev/imu" />
 
-    <!-- Robot communication -->
-    <include file="$(find beaverbot_driver)/launch/beaverbot_driver.launch">
-		<arg name="port" value="$(arg robot_port)" />
-    </include>
-    
     <!-- GPS -->
     <include file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
 		<arg name="port" value="$(arg gnss_port)" />

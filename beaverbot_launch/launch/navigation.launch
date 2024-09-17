@@ -6,7 +6,7 @@
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
     <!-- Run bringup sensors -->
-    <include file="$(find nitrabot_launch)/launch/bringup.launch" />
+    <include file="$(find beaverbot_launch)/launch/bringup.launch" />
 
     <!-- Run localization -->
     <include file="$(find beaverbot_localization)/launch/ekf_localization.launch" />

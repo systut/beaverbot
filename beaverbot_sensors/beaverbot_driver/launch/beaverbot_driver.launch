@@ -1,12 +1,12 @@
 <launch>
-    <arg name="port" default="/dev/ttyUSB0" />
+    <arg name="port" default="/dev/driver" />
 	<arg name="publish_tf" default="false"/>
 	
-	<node name="robot_communication" pkg="nitrabot_communication" type="robot_communication" >
+	<node name="robot_communication" pkg="beaverbot_driver" type="robot_communication" >
 		<param name="port" value="$(arg port)" />
 	</node>
 
-	<node name="encoder_to_odom" pkg="nitrabot_communication" type="encoder_to_odom" >
+	<node name="encoder_to_odom" pkg="beaverbot_driver" type="encoder_to_odom" >
 		<param name="publish_tf" value="$(arg publish_tf)"/>
 	</node>
 
