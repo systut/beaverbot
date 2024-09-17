@@ -19,6 +19,7 @@ ros_dep="ros-noetic-tf \
          ros-noetic-rviz-imu-plugin \
          ros-noetic-imu-filter-madgwick \
          ros-noetic-robot-localization \
+         ros-noetic-map-server \
          ros-noetic-navigation"
 
 python_dep="rospy-message-converter \
