@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+##
+# @file beaverbot_control_node
+#
+# @brief Provide a ROS node to control the Beaverbot robot. This file is
+# to hide the extension of a python script.
+#
+# @section author_doxygen_example Author(s)
+# - Created by Tran Viet Thanh on 08/12/2024.
+#
+# Copyright (c) 2024 System Engineering Laboratory.  All rights reserved.
+
+# External library
+from tsnd5_driver.tsnd5_driver_node import Tsnd5DriverNode
+
+
+try:
+    tsnd5_driver_node = Tsnd5DriverNode()
+
+    tsnd5_driver_node.run()
+
+except Exception:
+    pass
+
+finally: 
+    tsnd5_driver_node._close_sensor()
