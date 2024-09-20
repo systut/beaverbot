@@ -29,7 +29,15 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    command: bash
+    entrypoint:
+      - bash 
+      - -c
+    command: > 
+      "source /opt/ros/noetic/setup.bash &&
+      source /root/catkin_ws/devel/setup.bash &&
+      sleep 2 &&
+      roslaunch beaverbot_launch navigation.launch"
+
 
   robot_communication:
     user: root
