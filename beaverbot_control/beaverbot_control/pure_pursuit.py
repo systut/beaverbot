@@ -62,7 +62,7 @@ class PurePursuit:
 
         v = 0.2
 
-        w = v * 2.0 * math.sin(alpha) / lookahead_distance
+        w = v * 2.0 * alpha / lookahead_distance
 
         return status, [v, w]
 
