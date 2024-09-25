@@ -50,10 +50,25 @@ class PurePursuit:
 
         index, lookahead_distance = self._search_target_index(state, input)
 
+        if previous_index >= index:
+            index = previous_index
+
+        if index < len(self.trajectory.x):
+            trajectory_x = self.trajectory.x[index, 0]
+
+            trajectory_y = self.trajectory.x[index, 1]
+
+        else:
+            trajectory_x = self.trajectory.x[-1, 0]
+
+            trajectory_y = self.trajectory.x[-1, 1]
+
+            index = len(self.trajectory.x) - 1
+
         alpha = (
             math.atan2(
-                self.trajectory.x[index, 1] - state[1],
-                self.trajectory.x[index, 0] - state[0],
+                trajectory_x - state[1],
+                trajectory_y - state[0],
             )
             - state[2]
         )

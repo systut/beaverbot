@@ -16,6 +16,7 @@ from collections import namedtuple
 import rospy
 import numpy as np
 from nav_msgs.msg import Odometry, Path
+from scipy.spatial.transform import Rotation
 from geometry_msgs.msg import Twist, PoseStamped
 
 # Internal library
@@ -122,9 +123,18 @@ class BeaverbotControl(object):
         """! Odometry callback
         @param msg<Odometry>: The odometry message
         """
+        quaternion = (
+            msg.pose.pose.orientation.x,
+            msg.pose.pose.orientation.y,
+            msg.pose.pose.orientation.z,
+            msg.pose.pose.orientation.w,
+        )
+
+        heading = Rotation.from_quat(quaternion).as_euler("zyx")[0]
+
         self._state = [msg.pose.pose.position.x,
                        msg.pose.pose.position.y,
-                       msg.pose.pose.orientation.z]
+                       heading]
 
     def _timer_callback(self, event):
         """! Timer callback
