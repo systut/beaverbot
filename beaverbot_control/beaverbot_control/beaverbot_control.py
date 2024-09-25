@@ -15,8 +15,8 @@ from collections import namedtuple
 # External library
 import rospy
 import numpy as np
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry, Path
+from geometry_msgs.msg import Twist, PoseStamped
 
 # Internal library
 from beaverbot_control.pure_pursuit import PurePursuit
@@ -41,7 +41,7 @@ class BeaverbotControl(object):
         self._read_parameters()
 
         self._register_controllers()
-        
+
         self._register_publishers()
 
         self._register_subscribers()
@@ -99,7 +99,8 @@ class BeaverbotControl(object):
     def _register_subscribers(self):
         """! Register subscriber
         """
-        rospy.Subscriber("odometry/filtered/global", Odometry, self._odom_callback)
+        rospy.Subscriber("odometry/filtered/global", Odometry,
+                         self._odom_callback)
 
     def _register_publishers(self):
         """! Register publisher
@@ -107,6 +108,9 @@ class BeaverbotControl(object):
         self._velocity_publisher = rospy.Publisher(
             "cmd_vel",
             Twist, queue_size=10)
+
+        self._trajectory_publisher = rospy.Publisher(
+            "reference_trajectory", Path, queue_size=10)
 
     def _register_timers(self):
         """! Register timers
@@ -201,7 +205,30 @@ class BeaverbotControl(object):
         trajectory_instance = namedtuple("Trajectory", trajectory.keys())(
             *trajectory.values())
 
+        self._visualize_trajectory(trajectory_instance)
+
         return trajectory_instance
+
+    def _visualize_trajectory(self, trajectory):
+        """! Visualize the trajectory
+        @param trajectory<list>: The trajectory
+        """
+        path = Path()
+
+        path.header.frame_id = "map"
+
+        for index in range(len(trajectory.x)):
+            pose = PoseStamped()
+
+            pose.header.frame_id = "map"
+
+            pose.pose.position.x = trajectory.x[index, 0]
+
+            pose.pose.position.y = trajectory.x[index, 1]
+
+            path.poses.append(pose)
+
+        self._trajectory_publisher.publish(path)
 
     def _retrieve_u(self, initial_index, data, nx, nu, is_derivative):
         """! Retrieve the input at time t.
