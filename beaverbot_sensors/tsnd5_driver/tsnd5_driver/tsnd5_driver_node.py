@@ -103,7 +103,9 @@ class Tsnd5DriverNode:
         self._q = Queue()
 
         self._driver.set_response_queue(
-            'quaternion_acc_gyro_data', self.q)
+            'quaternion_acc_gyro_data', self._q)
+        
+        _ = self._driver.start_recording(force_restart=True).timestamp()
 
     def _close_sensor(self):
         """! Close sensor.
@@ -135,6 +137,8 @@ class Tsnd5DriverNode:
         @param event Timer event.
         """
         if self._q.empty():
+            rospy.logwarn("Queue for IMU data is empty")
+
             return
 
         data = np.array([self._parse_queue_data(self._q.get()) for i in range(
