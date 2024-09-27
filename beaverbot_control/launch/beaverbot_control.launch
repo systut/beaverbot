@@ -2,7 +2,7 @@
     <node name="beaverbot_control_node" pkg="beaverbot_control" type="beaverbot_control_node" output="screen">
         <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/loop_l_shape_0.3.csv"/>
         <param name="~sampling_time" value="0.05"/>
-        <param name="~controller_type" value="feedforward"/>
+        <param name="~controller_type" value="pure_pursuit"/>
         <param name="~is_derivative" value="true"/>
         <!-- <remap from="cmd_vel" to="/beaverbot_diff_drive_controller/cmd_vel"/> -->
     </node>

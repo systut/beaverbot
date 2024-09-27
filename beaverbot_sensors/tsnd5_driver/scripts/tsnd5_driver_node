@@ -13,10 +13,9 @@
 # External library
 from tsnd5_driver.tsnd5_driver_node import Tsnd5DriverNode
 
+tsnd5_driver_node = Tsnd5DriverNode()
 
 try:
-    tsnd5_driver_node = Tsnd5DriverNode()
-
     tsnd5_driver_node.run()
 
 except Exception:

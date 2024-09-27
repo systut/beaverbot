@@ -41,9 +41,9 @@ class BeaverbotControl(object):
 
         self._read_parameters()
 
-        self._register_controllers()
-
         self._register_publishers()
+
+        self._register_controllers()
 
         self._register_subscribers()
 
@@ -130,7 +130,7 @@ class BeaverbotControl(object):
             msg.pose.pose.orientation.w,
         )
 
-        heading = Rotation.from_quat(quaternion).as_euler("zyx")[0]
+        heading = Rotation.from_quat(quaternion).as_euler("zyx", degrees=False)[0]
 
         self._state = [msg.pose.pose.position.x,
                        msg.pose.pose.position.y,
@@ -238,7 +238,8 @@ class BeaverbotControl(object):
 
             path.poses.append(pose)
 
-        self._trajectory_publisher.publish(path)
+        for _ in range(10):
+            self._trajectory_publisher.publish(path)
 
     def _retrieve_u(self, initial_index, data, nx, nu, is_derivative):
         """! Retrieve the input at time t.

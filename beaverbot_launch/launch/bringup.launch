@@ -9,8 +9,10 @@
     </include>
 
     <!-- IMU -->
-    <include file="$(find rt_usb_9axisimu_driver)/launch/rt_usb_9axisimu_driver.launch">
+    <!-- <include file="$(find rt_usb_9axisimu_driver)/launch/rt_usb_9axisimu_driver.launch">
 		<arg name="port" value="$(arg imu_port)" />
-    </include>
+    </include> -->
 
+    <include file="$(find tsnd5_driver)/launch/tsnd5_driver.launch">
+    </include>
 </launch>
