@@ -22,11 +22,10 @@
     </visual>
     <collision>
       <geometry>
-        <box size="1.24 0.74 0.46"/>	<!-- rough robot size: x=1.24 y=0.74 z=0.46 -->
+        <box size="0.01 0.01 0.01"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="0.395 0.0 0.12"/>
     </collision>
-    <!--<xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" />-->
+    <xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" />
   </link>
   <gazebo reference="base_link">
     <material>Gazebo/Black</material>
@@ -64,7 +63,7 @@
   <joint name="base_link_to_robot_center" type="fixed">
     <parent link="base_link"/>
     <child link="robot_center"/>
-    <origin xyz="0.415 0.0 0.0" />
+    <origin xyz="0 0.0 0.0" />
   </joint>
 
   <!-- ////////////////////////// Base Link and Wheel Connections and Links ////////////////////////// -->

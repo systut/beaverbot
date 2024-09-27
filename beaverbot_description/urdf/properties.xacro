@@ -23,7 +23,7 @@
   <xacro:property name="zylinder_to_castor_mass" value="0.725" />   <!-- updated -->
   <xacro:property name="castor_plate_mass" value="0.12" />          <!-- updated -->
   <xacro:property name="castor_support_mass" value="0.1" />         <!-- updated -->
-  <xacro:property name="castor_mass" value="0.3" />                 <!-- updated -->
+  <xacro:property name="castor_mass" value="0.5" />                 <!-- updated -->
   
   <xacro:property name="top_support_mass" value="0.65" />           <!-- updated -->
   <xacro:property name="top_frame_yellow_mass" value="1.5" />       <!-- updated -->
