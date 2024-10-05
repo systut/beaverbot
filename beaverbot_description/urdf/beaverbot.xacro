@@ -178,7 +178,7 @@
     </joint>
   </xacro:macro>
   
-  <xacro:macro name="default_zylinder_in_Y_with_collision" params="parent child_name mass length radius ox oy oz roll pitch yaw color">
+  <xacro:macro name="default_zylinder_in_Y_with_collision" params="parent child_name mass length radius ox oy oz roll pitch yaw color mu1 mu2 kp kd">
     <link name="${child_name}" >
       <visual>
         <geometry>
@@ -196,6 +196,10 @@
       <xacro:inertial_zylinder_y mass="${mass}" radius="${radius}" height="${length}" />
     </link>
     <gazebo reference="${child_name}" >
+      <mu1 value="${mu1}"/>
+      <mu2 value="${mu2}"/>
+      <kp value="${kp}" />
+      <kd value="${kd}" />
       <material>Gazebo/${color}</material>
     </gazebo>
     <joint name="${parent}_to_${child_name}" type="fixed">
