@@ -121,44 +121,13 @@
 
   <xacro:lidar_sensor parent="lidar_base" lidar_name="laser" length="${lidar_length}" radius="${lidar_radius}" mass="${lidar_mass}" ox="0.0" oy="0.0" oz="0.0325" update_rate="${lidar_update_rate}" min_angle="${lidar_min_angle}" max_angle="${lidar_max_angle}" min_range="${lidar_min_range}" max_range="${lidar_max_range}" range_resolution="${lidar_range_resolution}" stdv="${lidar_stdv}" />
 
-  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu_sensor" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" update_rateHz="${imu_update_rateHz}" noise="${imu_noise}" />
+  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu" imu_topic="imu/data_raw" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" update_rateHz="${imu_update_rateHz}" noise="${imu_noise}" />
 
   <!-- /////////////////////////////////////////////////////////////////////////// -->
  <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>$(arg robot_namespace)</robotNamespace>
       <legacyModeNS>true</legacyModeNS>
-    </plugin>
-  </gazebo>
-
-  <gazebo>
-    <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
-      <robotNamespace>$(arg robot_namespace)</robotNamespace>
-      <updateRate>50.0</updateRate>
-      <bodyName>base_link</bodyName>
-      <topicName>imu/data_raw</topicName>
-      <accelDrift>0.005 0.005 0.005</accelDrift>
-      <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
-      <rateDrift>0.005 0.005 0.005 </rateDrift>
-      <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
-      <headingDrift>0.005</headingDrift>
-      <headingGaussianNoise>0.005</headingGaussianNoise>
-    </plugin>
-  </gazebo>
-
-  <gazebo>
-    <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
-      <robotNamespace>$(arg robot_namespace)</robotNamespace>
-      <updateRate>40</updateRate>
-      <bodyName>base_link</bodyName>
-      <frameId>map</frameId>
-      <topicName>navsat/fix</topicName>
-      <velocityTopicName>navsat/vel</velocityTopicName>
-      <referenceLatitude>34.835190564394</referenceLatitude>
-      <referenceLongitude>137.45711512765206</referenceLongitude>
-      <referenceHeading>0</referenceHeading>
-      <referenceAltitude>0</referenceAltitude>
-      <drift>0.0001 0.0001 0.0001</drift>
     </plugin>
   </gazebo>
 

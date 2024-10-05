@@ -234,49 +234,84 @@
       </sensor>
     </gazebo>
   </xacro:macro>
+	<!-- /////////////////////////////////////////////////////////////////// -->
 
-<!-- /////////////////////////////////////////////////////////////////// -->
-
-<!-- ////////////////////////////// IMU ////////////////////////////// -->
-
-  <xacro:macro name="imu_sensor" params="parent imu_name mass sizex sizey sizez ox oy oz update_rate update_rateHz noise" >
+	<!-- ////////////////////////////// IMU ////////////////////////////// -->
+  <xacro:macro name="imu_sensor" params="parent imu_name imu_topic mass sizex sizey sizez ox oy oz update_rate update_rateHz noise" >
     <link name="${imu_name}">
+			<visual>
+				<geometry>
+					<box size="${sizex} ${sizey} ${sizez}"/>
+				</geometry>
+				<material name="White"/>
+			</visual>
+			<xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+    </link>
+		<joint name="${parent}_to_${imu_name}" type="fixed">
+			<parent link="${parent}"/>
+			<child link="${imu_name}"/>
+			<origin xyz="${ox} ${oy} ${oz}"/>
+		</joint>
+    <gazebo reference="${imu_name}">
+      <material>Gazebo/White</material>
+			<gravity>true</gravity>
+			<sensor name="${imu_name}_sensor" type="imu">
+				<always_on>true</always_on>
+				<update_rate>${update_rate}</update_rate>
+				<visualize>true</visualize>
+				<topic>${imu_topic}</topic>
+				<plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+					<topicName>${imu_topic}</topicName>
+					<bodyName>${imu_name}</bodyName>
+					<updateRateHZ>${update_rateHz}</updateRateHZ>
+					<gaussianNoise>${noise}</gaussianNoise>
+					<xyzOffset>0 0 0</xyzOffset>
+					<rpyOffset>0 0 0</rpyOffset>
+					<frameName>${imu_name}</frameName>
+				</plugin>
+				<pose>0 0 0 0 0 0</pose>
+			</sensor>
+    </gazebo>
+  </xacro:macro>
+	<!-- ///////////////////////////////////////////////////////////////// -->
+	<!-- ////////////////////////////GPS SENSORS//////////////////////////// -->
+  <xacro:macro name="gps_sensor" params="parent gps_name mass sizex sizey sizez ox oy oz update_rate update_rateHz noise">
+	<link name="${gps_name}">
 	  <visual>
 	    <geometry>
 	      <box size="${sizex} ${sizey} ${sizez}"/>
 		</geometry>
-	    <material name="White"/>
-	  </visual>
+		<material name="White"/>
+	  </visual>	
 	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
-    </link>
-	<joint name="${parent}_to_${imu_name}" type="fixed">
+	</link>
+	<joint name="${parent}_to_${gps_name}" type="fixed">
 	  <parent link="${parent}"/>
-	  <child link="${imu_name}"/>
+	  <child link="${gps_name}"/>
 	  <origin xyz="${ox} ${oy} ${oz}"/>
 	</joint>
-        <!-- maybe switch to the Hector version of the IMU -->
-    <gazebo reference="${imu_name}">
-      <material>Gazebo/White</material>
+	<gazebo reference="${gps_name}">
+		<material>Gazebo/White</material>
 	  <gravity>true</gravity>
-	  <sensor name="${imu_name}_sensor" type="imu">
-	    <always_on>true</always_on>
+	  <sensor name="${gps_name}_sensor" type="gps">
+			<always_on>true</always_on>
 	    <update_rate>${update_rate}</update_rate>
 	    <visualize>true</visualize>
-	    <topic>__default_topic__</topic>
-  		<plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-		  <topicName>imu</topicName>
-                  <bodyName>${imu_name}</bodyName>
-		  <updateRateHZ>${update_rateHz}</updateRateHZ>
-                  <gaussianNoise>${noise}</gaussianNoise>
-		  <xyzOffset>0 0 0</xyzOffset>
-		  <rpyOffset>0 0 0</rpyOffset>
-                  <frameName>${imu_name}</frameName>
-	    </plugin>
-	    <pose>0 0 0 0 0 0</pose>
-	  </sensor>
-    </gazebo>
-  </xacro:macro>
-
-<!-- ///////////////////////////////////////////////////////////////// -->
-
+	    <topic>${imu_topic}</topic>
+		<plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+			<robotNamespace>$(arg robot_namespace)</robotNamespace>
+		  <updateRate>40</updateRate>
+			<bodyName>base_link</bodyName>
+			<frameId>map</frameId>
+			<topicName>navsat/fix</topicName>
+			<velocityTopicName>navsat/vel</velocityTopicName>
+			<referenceLatitude>34.835190564394</referenceLatitude>
+			<referenceLongitude>137.45711512765206</referenceLongitude>
+			<referenceHeading>0</referenceHeading>
+			<referenceAltitude>0</referenceAltitude>
+			<drift>0.0001 0.0001 0.0001</drift>
+		</plugin>
+			</sensor>
+	</gazebo>
+	</xacro:macro>
 </robot>
