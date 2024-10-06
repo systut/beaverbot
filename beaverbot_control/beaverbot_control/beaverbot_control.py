@@ -130,7 +130,8 @@ class BeaverbotControl(object):
             msg.pose.pose.orientation.w,
         )
 
-        heading = Rotation.from_quat(quaternion).as_euler("zyx", degrees=False)[0]
+        heading = Rotation.from_quat(quaternion).as_euler(
+            "zyx", degrees=False)[0]
 
         self._state = [msg.pose.pose.position.x,
                        msg.pose.pose.position.y,
@@ -157,6 +158,11 @@ class BeaverbotControl(object):
 
             return
 
+        if self._is_goal(self._state, self._controller.trajectory):
+            rospy.loginfo("The vehicle has reached the goal")
+
+            u = [0, 0]
+
         msg = self._convert_control_input_to_msg(u)
 
         rospy.loginfo(f"Send control input {msg}")
@@ -164,6 +170,20 @@ class BeaverbotControl(object):
         self._velocity_publisher.publish(msg)
 
         self._index += 1
+
+    def _is_goal(self, state, trajectory):
+        """! Check if the vehicle has reached the goal
+        @param state<list>: The state of the vehicle
+        @param trajectory<instance>: The trajectory
+        @return<bool>: The flag to indicate if the vehicle has reached the goal
+        """
+        delta_x = trajectory.x[-1, 0] - state[0]
+
+        delta_y = trajectory.x[-1, 1] - state[1]
+
+        distance = np.hypot(delta_x, delta_y)
+
+        return distance < 0.1
 
     def _convert_control_input_to_msg(self, u):
         """! Convert control input to message

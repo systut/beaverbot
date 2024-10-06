@@ -7,7 +7,6 @@
     <arg name="robot_namespace" default="/"/>
     <arg name="world_name" default="worlds/empty.world"/>
     <arg name="model" default="$(find beaverbot_description)/urdf/beaverbot.urdf.xacro"/>
-    <arg name="rvizconfig" default="$(find beaverbot_description)/rviz/urdf.rviz"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="debug" value="$(arg debug)" />
@@ -29,8 +28,6 @@
 
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
         args="-z 1.0 -x 0.0 -y 0.0 -unpause -urdf -model beaverbot -param robot_description"/>
-
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
         <param name="default_topic" value="/beaverbot/cmd_vel"/>

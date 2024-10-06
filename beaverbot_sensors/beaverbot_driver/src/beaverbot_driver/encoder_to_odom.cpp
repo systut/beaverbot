@@ -76,7 +76,7 @@ public:
     EncoderOdom(ros::NodeHandle nh)
     {
 	nh_ = nh;
-	odometry_ = nh_.advertise<nav_msgs::Odometry>("/nitrabot/odom", 50);
+	odometry_ = nh_.advertise<nav_msgs::Odometry>("/beaverbot/odom", 50);
 
 	ros::param::param<bool>("~publish_tf", publish_tf_, true);
 	// initialize pose and twist
