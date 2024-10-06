@@ -121,7 +121,9 @@
 
   <xacro:lidar_sensor parent="lidar_base" lidar_name="laser" length="${lidar_length}" radius="${lidar_radius}" mass="${lidar_mass}" ox="0.0" oy="0.0" oz="0.0325" update_rate="${lidar_update_rate}" min_angle="${lidar_min_angle}" max_angle="${lidar_max_angle}" min_range="${lidar_min_range}" max_range="${lidar_max_range}" range_resolution="${lidar_range_resolution}" stdv="${lidar_stdv}" />
 
-  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu" imu_topic="imu/data_raw" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" update_rateHz="${imu_update_rateHz}" noise="${imu_noise}" />
+  <xacro:imu_sensor parent="back_base_support_frame" imu_name="imu" imu_topic="imu/data_raw" mass="${imu_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.01" update_rate="${imu_update_rate}" noise="${imu_noise}" />
+
+  <xacro:gps_sensor parent="back_base_support_frame" gps_name="gps" gps_topic="gps/fix" mass="${gps_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.0015" update_rate="${gps_update_rate}" initial_latitude="${gps_latitude}" initial_longitude="${gps_longitude}" noise="${gps_noise}" />
 
   <!-- /////////////////////////////////////////////////////////////////////////// -->
  <gazebo>

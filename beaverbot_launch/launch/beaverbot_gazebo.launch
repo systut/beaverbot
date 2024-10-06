@@ -25,7 +25,7 @@
     <rosparam command="load" file="$(find beaverbot_description)/config/control.yaml" />
 
     <node name="gazebo_controller_spawner" pkg="controller_manager" type="spawner"
-            args="beaverbot_joint_publisher beaverbot_diff_drive_controller"/>
+            args="beaverbot_joint_publisher beaverbot"/>
 
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
         args="-z 1.0 -x 0.0 -y 0.0 -unpause -urdf -model beaverbot -param robot_description"/>
@@ -33,6 +33,6 @@
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
-        <param name="default_topic" value="/beaverbot_diff_drive_controller/cmd_vel"/>
+        <param name="default_topic" value="/beaverbot/cmd_vel"/>
     </node>
 </launch>
