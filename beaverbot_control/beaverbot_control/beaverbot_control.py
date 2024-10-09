@@ -71,8 +71,8 @@ class BeaverbotControl(object):
         self._trajectory_file = rospy.get_param(
             "~trajectory_file")
 
-        self._is_derivative = rospy.get_param(
-            "~is_derivative", True)
+        self._trajectory_type = rospy.get_param(
+            "~trajectory_type", "derivative")
 
         self._state = None
 
@@ -82,11 +82,13 @@ class BeaverbotControl(object):
 
         self._index = 0
 
+        self._length_base = 0.53
+
     def _register_controllers(self):
         """! Register controllers
         """
         trajectory = self._generate_trajectory(
-            self._trajectory_file, self._nx, self._nu, self._is_derivative)
+            self._trajectory_file, self._nx, self._nu, self._trajectory_type)
 
         if self._controller_type == "pure_pursuit":
             self._controller = PurePursuit(trajectory)
@@ -183,13 +185,13 @@ class BeaverbotControl(object):
 
         return msg
 
-    def _generate_trajectory(self, file_path, nx, nu, is_derivative=False):
+    def _generate_trajectory(self, file_path, nx, nu, trajectory_type=False):
         """! Generate a simple trajectory.
         @param file_path<str>: The file path of the
         generated trajectory
         @param nx<int>: The number of states
         @param nu<int>: The number of inputs
-        @param is_derivative<bool>: The flag to indicate if the
+        @param trajectory_type<bool>: The flag to indicate if the
         generated trajectory is a derivative
         @return None
         """
@@ -206,7 +208,7 @@ class BeaverbotControl(object):
 
         if len(data) > 1 + nx:
             trajectory["u"] = self._retrieve_u(
-                initial_index, data, nx, nu, is_derivative)
+                initial_index, data, nx, nu, trajectory_type)
 
         trajectory["t"] = np.array(data[initial_index:, 0])
 
@@ -241,15 +243,15 @@ class BeaverbotControl(object):
         for _ in range(10):
             self._trajectory_publisher.publish(path)
 
-    def _retrieve_u(self, initial_index, data, nx, nu, is_derivative):
+    def _retrieve_u(self, initial_index, data, nx, nu, trajectory_type):
         """! Retrieve the input at time t.
         @param t<float>: The time
         @return u<list>: The input
         """
-        if not is_derivative:
-            u = np.array(data[initial_index:, 1 + nx: 1 + nx + nu])
+        if trajectory_type == "normal":
+            u = np.transpose(np.array(data[initial_index:, 1 + nx: 1 + nx + nu]))
 
-        else:
+        elif trajectory_type == "derivative":
             u = np.zeros((self._nu, len(data) - initial_index))
 
             u[0, :] = np.hypot(
@@ -259,5 +261,14 @@ class BeaverbotControl(object):
 
             u[1, :] = np.array(
                 data[initial_index:, 1 + nx + 2: 1 + nx + 3]).reshape(-1)
+
+        elif trajectory_type == "wheel":
+            u = np.zeros((self._nu, len(data) - initial_index))
+
+            u[0, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) + 
+                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / 2
+
+            u[1, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) - 
+                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / self._length_base
 
         return u
