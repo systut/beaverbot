@@ -67,15 +67,15 @@ class PurePursuit:
 
         alpha = (
             math.atan2(
-                trajectory_x - state[1],
-                trajectory_y - state[0],
+                trajectory_y - state[1],
+                trajectory_x - state[0],
             )
             - state[2]
         )
 
         alpha = math.atan2(math.sin(alpha), math.cos(alpha))
 
-        v = 0.2
+        v = 0.3
 
         w = v * 2.0 * alpha / lookahead_distance
 
