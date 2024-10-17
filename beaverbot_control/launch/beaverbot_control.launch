@@ -1,9 +1,9 @@
 <launch>
     <node name="beaverbot_control_node" pkg="beaverbot_control" type="beaverbot_control_node" output="screen">
-        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/slip-0.07.csv"/>
+        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/global_trajectory.csv"/>
         <param name="~sampling_time" value="0.05"/>
         <param name="~controller_type" value="feedforward"/>
-        <param name="~trajectory_type" value="wheel"/>
-        <!-- <remap from="cmd_vel" to="/beaverbot_diff_drive_controller/cmd_vel"/> -->
+        <param name="~trajectory_type" value="derivative"/>
+        <remap from="cmd_vel" to="/beaverbot/cmd_vel"/>
     </node>
 </launch>

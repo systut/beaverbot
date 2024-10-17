@@ -269,7 +269,8 @@ class BeaverbotControl(object):
         @return u<list>: The input
         """
         if trajectory_type == "normal":
-            u = np.transpose(np.array(data[initial_index:, 1 + nx: 1 + nx + nu]))
+            u = np.transpose(np.array(
+                data[initial_index:, 1 + nx: 1 + nx + nu]))
 
         elif trajectory_type == "derivative":
             u = np.zeros((self._nu, len(data) - initial_index))
@@ -285,10 +286,14 @@ class BeaverbotControl(object):
         elif trajectory_type == "wheel":
             u = np.zeros((self._nu, len(data) - initial_index))
 
-            u[0, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) + 
-                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / 2
+            u[0, :] = (
+                np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) +
+                np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])
+            ).reshape(-1) / 2
 
-            u[1, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) - 
-                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / self._length_base
+            u[1, :] = (
+                np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) -
+                np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])
+            ).reshape(-1) / self._length_base
 
         return u
