@@ -163,7 +163,6 @@
     <transmission name="${child_name}_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <actuator name="${child_name}_motor">
-        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
       <joint name="${parent}_to_${child_name}">

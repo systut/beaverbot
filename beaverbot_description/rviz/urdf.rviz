@@ -222,7 +222,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -246,7 +246,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 11.360799789428711
+      Distance: 10.720416069030762
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -254,17 +254,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 2.3760554790496826
-        Y: -1.4243091344833374
-        Z: -2.576575517654419
+        X: -0.5338408946990967
+        Y: 0.2064054012298584
+        Z: -2.511122465133667
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.7447971105575562
       Target Frame: <Fixed Frame>
-      Yaw: 6.276767253875732
+      Yaw: 0.8085820078849792
     Saved: ~
 Window Geometry:
   Displays:
