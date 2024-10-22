@@ -64,10 +64,12 @@
   <xacro:property name="gps_latitude" value="34.835190564394" />
   <xacro:property name="gps_longitude" value="137.45711512765206" />
 
-  <xacro:property name="mu1" value="0.6" />
-  <xacro:property name="mu2" value="0.6" />
+  <xacro:property name="mu1" value="0.1" />
+  <xacro:property name="mu2" value="0.1" />
   <xacro:property name="kp" value="10000000.0" />
-  <xacro:property name="kd" value="40.0" />
+  <xacro:property name="kd" value="1.0" />
+  
+  <xacro:property name="use_trailer" value="true" />
   <!-- ///////////////////////////////////////////////////////////// -->
   
 </robot>

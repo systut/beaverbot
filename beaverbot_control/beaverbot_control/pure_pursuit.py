@@ -48,6 +48,9 @@ class PurePursuit:
         """
         status = True
 
+        if self._is_goal(state, self.trajectory):
+            return False, [0, 0]
+
         index, lookahead_distance = self._search_target_index(state, input)
 
         if previous_index >= index:
@@ -153,3 +156,18 @@ class PurePursuit:
         y = distance[:, 1] if distance.ndim == 2 else distance[1]
 
         return np.hypot(x, y)
+
+    @staticmethod
+    def _is_goal(state, trajectory):
+        """! Check if the vehicle has reached the goal
+        @param state<list>: The state of the vehicle
+        @param trajectory<instance>: The trajectory
+        @return<bool>: The flag to indicate if the vehicle has reached the goal
+        """
+        delta_x = trajectory.x[-1, 0] - state[0]
+
+        delta_y = trajectory.x[-1, 1] - state[1]
+
+        distance = np.hypot(delta_x, delta_y)
+
+        return distance < 0.1

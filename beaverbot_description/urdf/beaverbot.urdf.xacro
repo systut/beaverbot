@@ -125,6 +125,9 @@
 
   <xacro:gps_sensor parent="back_base_support_frame" gps_name="gps" gps_topic="gps/fix" mass="${gps_mass}" sizex="0.03" sizey="0.03" sizez="0.005" ox="0.0" oy="0.0" oz="0.0015" update_rate="${gps_update_rate}" initial_latitude="${gps_latitude}" initial_longitude="${gps_longitude}" noise="${gps_noise}" />
 
+  <xacro:if value="${use_trailer}">
+    <xacro:trailer parent="base" trailer_name="trailer" mu1="0.1" mu2="0.1" kp="${kp}" kd="${kd}" />
+  </xacro:if>
   <!-- /////////////////////////////////////////////////////////////////////////// -->
  <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">

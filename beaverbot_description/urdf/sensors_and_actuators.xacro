@@ -174,6 +174,135 @@
   
 <!-- /////////////////////////////////////////////////////////////////// -->
 
+<!-- ////////////////////////////// Trailer ////////////////////////////// -->
+<xacro:macro name="trailer" params="parent trailer_name mu1 mu2 kp kd">
+	<link name="${trailer_name}_base_link">
+		<visual>
+			<geometry>
+				<box size="0.01 0.01 0.01"/>
+			</geometry>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="0.01 0.01 0.01"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+	</link>
+	<gazebo reference="${trailer_name}_base_link" >
+	  <material>Gazebo/White</material>
+	</gazebo>
+	<link name="${trailer_name}_connector">
+		<visual>
+			<origin xyz="-0.25 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.5 0.05 0.01"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="-0.25 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.5 0.05 0.01"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+	</link>
+	<link name="tractor_connector">
+		<visual>
+			<origin xyz="0.15 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.3 0.05 0.01"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0.15 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.3 0.05 0.01"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+	</link>
+	<gazebo reference="tractor_connector" >
+		<material>Gazebo/White</material>	
+	</gazebo>
+	<joint name="tractor_to_${parent}" type="fixed">
+		<parent link="${parent}" />
+		<child link="tractor_connector" />
+		<origin xyz="-0.45 0 0" rpy="0 0 0" />
+	</joint>
+	<joint name="tractor_connector_to_trailer_connector" type="revolute">
+		<parent link="tractor_connector" />
+		<child link="${trailer_name}_connector" />
+		<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+		<axis xyz="0 0 1" />
+		<limit lower="-${pi/4.0}" upper="${pi/4.0}" effort="1.0" velocity="0.01"/>
+		<dynamics damping="0.01" friction="0.01"/>
+	</joint>
+	<joint name="${trailer_name}_connector_to_${trailer_name}_base_link" type="fixed">
+		<parent link="${trailer_name}_connector" />
+		<child link="${trailer_name}_base_link" />
+		<origin xyz="-0.5 0 0" rpy="0 0 0" />
+	</joint>
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_left" mass="0.01" length="0.13" radius="0.05" ox="0.0" oy="0.155" oz="-0.061" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_right" mass="0.01" length="0.13" radius="0.05" ox="0.0" oy="-0.155" oz="-0.061" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<link name="${trailer_name}_left_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.05" radius="0.164" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.05" radius="0.164" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</collision>
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.164" height="0.01" />
+	</link>
+	<joint name="${trailer_name}_wheel_shaft_to_left_wheel" type="continuous">
+		<parent link="${trailer_name}_wheel_support_left" />
+		<child link="${trailer_name}_left_wheel" />
+		<origin xyz="0 0.095 0" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+	</joint>
+	<link name="${trailer_name}_right_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.05" radius="0.164" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.05" radius="0.164" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</collision>
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.164" height="0.05" />
+	</link>
+	<joint name="${trailer_name}_wheel_shaft_to_right_wheel" type="continuous">
+		<parent link="${trailer_name}_wheel_support_right" />
+		<child link="${trailer_name}_right_wheel" />
+		<origin xyz="0 -0.095 0" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+	</joint>
+	<gazebo reference="${trailer_name}_left_wheel" >
+      <mu1 value="${mu1}"/>
+      <mu2 value="${mu2}"/>
+      <kp value="${kp}" />
+      <kd value="${kd}" />
+      <material>Gazebo/White</material>
+    </gazebo>	
+    <gazebo reference="${trailer_name}_right_wheel" >
+      <mu1 value="${mu1}"/>
+      <mu2 value="${mu2}"/>
+      <kp value="${kp}" />
+      <kd value="${kd}" />
+      <material>Gazebo/White</material>
+    </gazebo>		
+  </xacro:macro>
+
 <!-- ////////////////////////////// Lidar ////////////////////////////// -->
 
   <xacro:macro name="lidar_sensor" params="parent lidar_name length radius mass ox oy oz update_rate min_angle max_angle min_range max_range range_resolution stdv" >
