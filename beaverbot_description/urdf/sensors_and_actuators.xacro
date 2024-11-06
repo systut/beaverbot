@@ -11,7 +11,7 @@
 	        </geometry>
 		<material name="White" />
 	  </visual>
-	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 
         <joint name="${parent}_to_${prefix}_${sufix}" type="fixed">
@@ -75,7 +75,7 @@
 		</geometry>
 		<material name="White" />
 	  </visual>
-	  <xacro:inertial_box mass="${mass}" x="${dist_size}" y="${dist_size}" z="${dist_size}" />
+	  <xacro:inertial_box mass="${mass}" x="${dist_size}" y="${dist_size}" z="${dist_size}" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 
 	<gazebo reference="${prefix}_distance_sensor_link_${sufix}">
@@ -179,18 +179,20 @@
 	<link name="${trailer_name}_base_link">
 		<visual>
 			<geometry>
-				<box size="0.01 0.01 0.01"/>
+				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
 			</geometry>
+			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
 		</visual>
 		<collision>
 			<geometry>
-				<box size="0.01 0.01 0.01"/>
+				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
 			</geometry>
+			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
 		</collision>
-		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" ox="-0.15" oy="0.4" oz="-0.05"/>
 	</link>
 	<gazebo reference="${trailer_name}_base_link" >
-	  <material>Gazebo/White</material>
+	  <material>Gazebo/Gray</material>
 	</gazebo>
 	<link name="${trailer_name}_connector">
 		<visual>
@@ -205,8 +207,11 @@
 				<box size="0.5 0.05 0.01"/>
 			</geometry>
 		</collision>
-		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
+	<gazebo reference="${trailer_name}_connector" >
+		<material>Gazebo/DarkGray</material>	
+	</gazebo>
 	<link name="tractor_connector">
 		<visual>
 			<origin xyz="0.15 0 0" rpy="0 0 0" />
@@ -220,15 +225,15 @@
 				<box size="0.3 0.05 0.01"/>
 			</geometry>
 		</collision>
-		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" />
+		<xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 	<gazebo reference="tractor_connector" >
-		<material>Gazebo/White</material>	
+		<material>Gazebo/DarkGray</material>	
 	</gazebo>
 	<joint name="tractor_to_${parent}" type="fixed">
 		<parent link="${parent}" />
 		<child link="tractor_connector" />
-		<origin xyz="-0.45 0 0" rpy="0 0 0" />
+		<origin xyz="-0.45 0 -0.1" rpy="0 0 0" />
 	</joint>
 	<joint name="tractor_connector_to_trailer_connector" type="revolute">
 		<parent link="tractor_connector" />
@@ -236,29 +241,29 @@
 		<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
 		<axis xyz="0 0 1" />
 		<limit lower="-${pi/4.0}" upper="${pi/4.0}" effort="1.0" velocity="0.01"/>
-		<dynamics damping="0.01" friction="0.01"/>
+		<dynamics damping="0.001" friction="0.001"/>
 	</joint>
 	<joint name="${trailer_name}_connector_to_${trailer_name}_base_link" type="fixed">
 		<parent link="${trailer_name}_connector" />
 		<child link="${trailer_name}_base_link" />
-		<origin xyz="-0.5 0 0" rpy="0 0 0" />
+		<origin xyz="-1 0 0" rpy="0 0 0" />
 	</joint>
-	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_left" mass="0.01" length="0.13" radius="0.05" ox="0.0" oy="0.155" oz="-0.061" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
-	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_right" mass="0.01" length="0.13" radius="0.05" ox="0.0" oy="-0.155" oz="-0.061" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_left" mass="0.001" length="0.1" radius="0.05" ox="0.0" oy="0.32" oz="-0.0" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_right" mass="0.001" length="0.1" radius="0.05" ox="0.0" oy="-0.32" oz="-0.0" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
 	<link name="${trailer_name}_left_wheel">
 		<visual>
 			<geometry>
-				<cylinder length="0.05" radius="0.164" />
+				<cylinder length="0.05" radius="0.114" />
 			</geometry>
 			<origin xyz="0 0 0" rpy="1.57 0 0" />
 		</visual>
 		<collision>
 			<geometry>
-				<cylinder length="0.05" radius="0.164" />
+				<cylinder length="0.05" radius="0.114" />
 			</geometry>
 			<origin xyz="0 0 0" rpy="1.57 0 0" />
 		</collision>
-		<xacro:inertial_zylinder_y mass="0.01" radius="0.164" height="0.01" />
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.114" height="0.01" />
 	</link>
 	<joint name="${trailer_name}_wheel_shaft_to_left_wheel" type="continuous">
 		<parent link="${trailer_name}_wheel_support_left" />
@@ -269,17 +274,17 @@
 	<link name="${trailer_name}_right_wheel">
 		<visual>
 			<geometry>
-				<cylinder length="0.05" radius="0.164" />
+				<cylinder length="0.05" radius="0.114" />
 			</geometry>
 			<origin xyz="0 0 0" rpy="1.57 0 0" />
 		</visual>
 		<collision>
 			<geometry>
-				<cylinder length="0.05" radius="0.164" />
+				<cylinder length="0.05" radius="0.114" />
 			</geometry>
 			<origin xyz="0 0 0" rpy="1.57 0 0" />
 		</collision>
-		<xacro:inertial_zylinder_y mass="0.01" radius="0.164" height="0.05" />
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.114" height="0.05" />
 	</link>
 	<joint name="${trailer_name}_wheel_shaft_to_right_wheel" type="continuous">
 		<parent link="${trailer_name}_wheel_support_right" />
@@ -292,14 +297,14 @@
       <mu2 value="${mu2}"/>
       <kp value="${kp}" />
       <kd value="${kd}" />
-      <material>Gazebo/White</material>
+      <material>Gazebo/DarkGray</material>
     </gazebo>	
     <gazebo reference="${trailer_name}_right_wheel" >
       <mu1 value="${mu1}"/>
       <mu2 value="${mu2}"/>
       <kp value="${kp}" />
       <kd value="${kd}" />
-      <material>Gazebo/White</material>
+      <material>Gazebo/DarkGray</material>
     </gazebo>		
   </xacro:macro>
 
@@ -373,7 +378,7 @@
 		</geometry>
 		<material name="White"/>
 	</visual>
-	<xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+	<xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
     </link>
 	<joint name="${parent}_to_${imu_name}" type="fixed">
 		<parent link="${parent}"/>
@@ -411,7 +416,7 @@
 		</geometry>
 		<material name="White"/>
 	  </visual>	
-	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 	<joint name="${parent}_to_${gps_name}" type="fixed">
 	  <parent link="${parent}"/>
