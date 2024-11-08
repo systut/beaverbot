@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(euler_generator)
+project(trajectory_generation)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
@@ -13,19 +13,24 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sdv_msgs
   tf
-  utilities REQUIRED
 )
 
 #find_package(Eigen3 REQUIRED)
 
+
+
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/global_trajectory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/a_star.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utilities.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/coverage_planner.cpp
     )
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/euler_generator/global_trajectory.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/euler_generator/a_star.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/trajectory_generation/global_trajectory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/trajectory_generation/a_star.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/trajectory_generation/utilities.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/trajectory_generation/coverage_planner.h
     )
 
 add_library(trajectory_lib ${SOURCES} ${HEADERS})
@@ -34,7 +39,7 @@ target_link_libraries(trajectory_lib ${catkin_LIBRARIES})
 catkin_package(
   INCLUDE_DIRS include
   DEPENDS EIGEN3
-  CATKIN_DEPENDS roscpp utilities
+  CATKIN_DEPENDS roscpp
 )
 ###########
 ## Build ##
