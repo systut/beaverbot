@@ -1,7 +1,4 @@
 <launch>
-    <arg name="robot_port" default="/dev/driver" />
-    <arg name="gnss_port" default="/dev/gps" />
-    <arg name="imu_port" default="/dev/imu" />
     <arg name="simulation" default="true" />
     <arg name="coverage_length" default="4"/>
     <arg name="coverage_width" default="10"/>
@@ -30,18 +27,8 @@
         </node>
     </group>
     <group unless = "$(arg simulation)">
-      <!-- GPS -->
-      <include file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
-      <arg name="port" value="$(arg gnss_port)" />
-      </include>
-
-      <!-- IMU -->
-      <!-- <include file="$(find rt_usb_9axisimu_driver)/launch/rt_usb_9axisimu_driver.launch">
-      <arg name="port" value="$(arg imu_port)" />
-      </include> -->
-
-      <include file="$(find tsnd5_driver)/launch/tsnd5_driver.launch">
-      </include>
+        <include file="$(find beaverbot_launch)/launch/sensors.launch">
+        </include>
     </group>
 
     <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true" output="screen">
@@ -49,6 +36,8 @@
       <param name="~length" value="${arg coverage_length}"/>
       <param name="~width" value="${arg coverage_width}"/>
     </node>
+
+    <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>  
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
 
