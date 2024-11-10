@@ -71,13 +71,13 @@ private:
 
     // Mobile robot parameters/////////////////////////////////////AWARE : MOST OF THESE ARE VALUES OF BIG MUSASHI ROBOT/////////////
     const double PI                 = 3.14159265359;
-    const double SAMPLING_TIME      = 1;              // [s]
+    const double SAMPLING_TIME      = 0.05;              // [s]
     const double ROBOT_MASS         = 120.4;             // [kg]
     const double ROBOT_LENGTH       = RobotConstants::ROBOT_LENGTH;               // [m]
     const double ROBOT_WIDTH        = RobotConstants::ROBOT_WIDTH;              // [m]
     const double WHEEL_RADIUS       = RobotConstants::WHEEL_RADIUS;              // [m]
     const double WHEEL_AXIS_DIST    = 0.5*ROBOT_WIDTH; // [m] Distance between a driving wheeland center of the wheel - to - wheel axis
-    const double GEAR_RATIO         = 100.0;                // [ ] Driving motor to wheel gear ratio
+    const double GEAR_RATIO         = 40.0;                // [ ] Driving motor to wheel gear ratio
     const double RATED_MOTOR_TORQUE = 1.3;               // [Nm]
     const double RATED_MOTOR_SPEED  = 3500;              // [RPM]
     const double MOTOR_INERTIA      = 0.66e-4;           // [kgm^2]
@@ -85,7 +85,7 @@ private:
     const double RATED_TORQUE = GEAR_RATIO * RATED_MOTOR_TORQUE;         // [Nm]    Torque reflected to the robot's wheels
     const double INERTIA      = GEAR_RATIO * GEAR_RATIO * MOTOR_INERTIA; // [kgm^2] INERTIA reflected to the robot's wheels
                      // [m/s]   Path velocity limit (< 0.943)
-    const double PATH_ACC_LIM  = RATED_TORQUE * WHEEL_RADIUS/ (0.25 * ROBOT_MASS * WHEEL_RADIUS * WHEEL_RADIUS + INERTIA);  // [m/s^2] 50% Path acceleration limit
+    const double PATH_ACC_LIM  = 0.5 * RATED_TORQUE * WHEEL_RADIUS/ (0.25 * ROBOT_MASS * WHEEL_RADIUS * WHEEL_RADIUS + INERTIA);  // [m/s^2] 50% Path acceleration limit
     const double PATH_JERK_LIM = PATH_ACC_LIM / (40 * SAMPLING_TIME); // [m/s^3] Path jerk limit
 
     const double ANG_ACC_LIM  = PATH_ACC_LIM / WHEEL_RADIUS;                   // [rad/s^2] Wheel angular acceleration limit
