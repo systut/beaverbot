@@ -56,13 +56,13 @@
   
   <xacro:property name="imu_update_rate" value="40.0" />
   <xacro:property name="imu_mass" value="0.05" />
-  <xacro:property name="imu_noise" value="0.001" />
+  <xacro:property name="imu_noise" value="0.01" />
   
   <xacro:property name="gps_update_rate" value="10.0" />	
   <xacro:property name="gps_mass" value="0.05" />
-  <xacro:property name="gps_noise" value="0.001" />
-  <xacro:property name="gps_latitude" value="34.835190564394" />
-  <xacro:property name="gps_longitude" value="137.45711512765206" />
+  <xacro:property name="gps_noise" value="0.01" />
+  <xacro:property name="gps_latitude" value="34.70242845166667" />
+  <xacro:property name="gps_longitude" value="137.408935105" />
 
   <xacro:property name="mu1" value="0.5" />
   <xacro:property name="mu2" value="0.5" />

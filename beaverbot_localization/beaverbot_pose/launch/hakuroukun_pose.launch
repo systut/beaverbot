@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="hakuroukun_pose" pkg="hakuroukun_pose" type="hakuroukun_pose_node" output="screen">
+        <param name="~log" value="true"/>
+        <param name="~log_folder" value="$(find hakuroukun_pose)/log_data"/>
+        <param name="~publish_rate" value="0.1"/>
+        <param name="~rotation_angle" value="-90"/>
+        <param name="~gps_to_rear_axis" value="0.6"/>
+        <param name="~imu_offset" value="0.0"/>
+        <remap from="fix" to="gps/fix"/>
+    </node>
+</launch>

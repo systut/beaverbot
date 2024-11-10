@@ -22,11 +22,13 @@ class PurePursuit:
     autonomous driving.
     """
 
-    lookahead_distance = 0.5
+    lookahead_distance = 2.0
 
     lookahead_gain = 0.1
 
     k = 1
+
+    wheel_base = 1.0
 
     # ==================================================================================================
     # PUBLIC METHODS
@@ -37,7 +39,17 @@ class PurePursuit:
         """
         self.trajectory = trajectory
 
-        self.old_nearest_point_index = None
+        self.lookahead_point = [0.0, 0.0]
+
+        self._old_nearest_point_index = None
+
+        self._previous_index = 0
+
+    def update_trajectory(self, trajectory):
+        """! Update the trajectory
+        @param trajectory<instance>: The trajectory
+        """
+        self.trajectory = trajectory
 
     def execute(self, state, input, previous_index):
         """! Execute the controller
@@ -53,8 +65,8 @@ class PurePursuit:
 
         index, lookahead_distance = self._search_target_index(state, input)
 
-        if previous_index >= index:
-            index = previous_index
+        if self._previous_index >= index:
+            index = self._previous_index
 
         if index < len(self.trajectory.x):
             trajectory_x = self.trajectory.x[index, 0]
@@ -67,6 +79,8 @@ class PurePursuit:
             trajectory_y = self.trajectory.x[-1, 1]
 
             index = len(self.trajectory.x) - 1
+
+        self._previous_index = index
 
         alpha = (
             math.atan2(
@@ -81,6 +95,8 @@ class PurePursuit:
         v = 0.3
 
         w = v * 2.0 * alpha / lookahead_distance
+
+        self.lookahead_point = [trajectory_x, trajectory_y]
 
         return status, [v, w]
 
@@ -103,13 +119,19 @@ class PurePursuit:
         return a
 
     def _search_target_index(self, state, input):
-        if self.old_nearest_point_index is None:
+        """! Search the target index
+        @param state<list>: The state of the vehicle
+        @param input<list>: The input of the vehicle
+        @return<int>: The index
+        @return<float>: The lookahead distance
+        """
+        if not self._old_nearest_point_index:
             all_distance = self._calculate_distance(self.trajectory.x, state)
 
             index = np.argmin(all_distance)
 
         else:
-            index = self.old_nearest_point_index
+            index = self._old_nearest_point_index
 
             this_distance = self._calculate_distance(
                 self.trajectory.x[index], state)
@@ -127,7 +149,7 @@ class PurePursuit:
 
                 this_distance = next_distance
 
-            self.old_nearest_point_index = index
+        self._old_nearest_point_index = index
 
         lookahead_distance = PurePursuit.lookahead_distance
 
@@ -148,16 +170,6 @@ class PurePursuit:
     # STATIC METHODS
     # ==================================================================================================
     @staticmethod
-    def _calculate_distance(reference_x, current_x):
-        distance = current_x - reference_x
-
-        x = distance[:, 0] if distance.ndim == 2 else distance[0]
-
-        y = distance[:, 1] if distance.ndim == 2 else distance[1]
-
-        return np.hypot(x, y)
-
-    @staticmethod
     def _is_goal(state, trajectory):
         """! Check if the vehicle has reached the goal
         @param state<list>: The state of the vehicle
@@ -170,4 +182,14 @@ class PurePursuit:
 
         distance = np.hypot(delta_x, delta_y)
 
-        return distance < 0.1
+        return distance < 0.3
+
+    @staticmethod
+    def _calculate_distance(reference_x, current_x):
+        distance = current_x - reference_x
+
+        x = distance[:, 0] if distance.ndim == 2 else distance[0]
+
+        y = distance[:, 1] if distance.ndim == 2 else distance[1]
+
+        return np.hypot(x, y)
