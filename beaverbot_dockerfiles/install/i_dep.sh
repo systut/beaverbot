@@ -19,11 +19,14 @@ ros_dep="ros-noetic-tf \
          ros-noetic-rviz-imu-plugin \
          ros-noetic-imu-filter-madgwick \
          ros-noetic-robot-localization \
+         ros-noetic-map-server \
          ros-noetic-navigation"
 
 python_dep="rospy-message-converter \
-         python-socketio
-         python-socketio[client]"
+         python-socketio  \
+         python-socketio[client] \
+         scipy \
+         pytz"
 
 apt-get update
 apt-get upgrade -y
@@ -33,3 +36,4 @@ apt-get autoremove -y
 apt-get clean -y
 python3 -m pip install $python_dep
 python3 -m pip install setuptools --upgrade
+python3 -m pip install importlib_metadata --force-reinstall

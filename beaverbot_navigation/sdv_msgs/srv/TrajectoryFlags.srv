@@ -1,0 +1,5 @@
+
+---
+sdv_msgs/TrajectoryPoint trajectory_point
+bool emergency_stop_flag
+bool avoidance_flag

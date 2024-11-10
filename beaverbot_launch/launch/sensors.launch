@@ -1,0 +1,22 @@
+<launch>
+    <arg name="lidar_port" default="/dev/ttyUSB0"/>
+    <arg name="lidar_baud" default="256000"/>
+    <arg name="robot_port" default="/dev/driver" />
+    <arg name="gnss_port" default="/dev/gps" />
+    <arg name="imu_port" default="/dev/imu" />
+
+    <node name="lidar_node"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+        <param name="serial_port"         type="string" value="$(arg lidar_port)"/>
+        <param name="serial_baudrate"     type="int"    value="$(arg lidar_baud)"/>
+        <param name="frame_id"            type="string" value="laser"/>
+        <param name="inverted"            type="bool"   value="false"/>
+        <param name="angle_compensate"    type="bool"   value="true"/>
+    </node>
+
+    <include file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
+        <arg name="port" value="$(arg gnss_port)" />
+    </include>
+
+    <include file="$(find tsnd5_driver)/launch/tsnd5_driver.launch">
+    </include>
+</launch>

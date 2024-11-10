@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt install -y libserial-dev python-catkin-tools
 
 # copy directory specific to scart
-COPY ./beaverbot_communication /root/catkin_ws/src/beaverbot_communication
+COPY ./beaverbot_sensors/beaverbot_driver /root/catkin_ws/src/beaverbot_driver
 
 # set default bash shell
 SHELL ["/bin/bash", "-c"]

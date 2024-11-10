@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="tsnd5_driver" type="tsnd5_driver_node" name="tsnd5_driver_node" args="" >
+
+    <param name="serial_port" value="/dev/ttyACM0"/>
+    <param name="sampling_time" value="0.01"/>
+  </node>
+</launch>

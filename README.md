@@ -190,3 +190,7 @@ In terminal 2
 docker compose exec nitra_robot bash
 roslaunch beaverbot_launch nav_pure_pursuit.launch
 ```
+
+```bash
+docker exec -it beaverbot bash -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
+```

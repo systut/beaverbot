@@ -11,7 +11,7 @@
 	        </geometry>
 		<material name="White" />
 	  </visual>
-	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
+	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 
         <joint name="${parent}_to_${prefix}_${sufix}" type="fixed">
@@ -75,7 +75,7 @@
 		</geometry>
 		<material name="White" />
 	  </visual>
-	  <xacro:inertial_box mass="${mass}" x="${dist_size}" y="${dist_size}" z="${dist_size}" />
+	  <xacro:inertial_box mass="${mass}" x="${dist_size}" y="${dist_size}" z="${dist_size}" ox="0.0" oy="0.0" oz="0.0"/>
 	</link>
 
 	<gazebo reference="${prefix}_distance_sensor_link_${sufix}">
@@ -163,7 +163,6 @@
     <transmission name="${child_name}_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <actuator name="${child_name}_motor">
-        <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
       <joint name="${parent}_to_${child_name}">
@@ -174,6 +173,140 @@
   </xacro:macro>
   
 <!-- /////////////////////////////////////////////////////////////////// -->
+
+<!-- ////////////////////////////// Trailer ////////////////////////////// -->
+<xacro:macro name="trailer" params="parent trailer_name mu1 mu2 kp kd">
+	<link name="${trailer_name}_base_link">
+		<visual>
+			<geometry>
+				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
+		</visual>
+		<collision>
+			<geometry>
+				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
+		</collision>
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" ox="-0.15" oy="0.4" oz="-0.05"/>
+	</link>
+	<gazebo reference="${trailer_name}_base_link" >
+	  <material>Gazebo/Gray</material>
+	</gazebo>
+	<link name="${trailer_name}_connector">
+		<visual>
+			<origin xyz="-0.25 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.5 0.05 0.01"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="-0.25 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.5 0.05 0.01"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" ox="0.0" oy="0.0" oz="0.0"/>
+	</link>
+	<gazebo reference="${trailer_name}_connector" >
+		<material>Gazebo/DarkGray</material>	
+	</gazebo>
+	<link name="tractor_connector">
+		<visual>
+			<origin xyz="0.15 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.3 0.05 0.01"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin xyz="0.15 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="0.3 0.05 0.01"/>
+			</geometry>
+		</collision>
+		<xacro:inertial_box mass="0.01" x="0.01" y="0.01" z="0.01" ox="0.0" oy="0.0" oz="0.0"/>
+	</link>
+	<gazebo reference="tractor_connector" >
+		<material>Gazebo/DarkGray</material>	
+	</gazebo>
+	<joint name="tractor_to_${parent}" type="fixed">
+		<parent link="${parent}" />
+		<child link="tractor_connector" />
+		<origin xyz="-0.45 0 -0.1" rpy="0 0 0" />
+	</joint>
+	<joint name="tractor_connector_to_trailer_connector" type="revolute">
+		<parent link="tractor_connector" />
+		<child link="${trailer_name}_connector" />
+		<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+		<axis xyz="0 0 1" />
+		<limit lower="-${pi/4.0}" upper="${pi/4.0}" effort="1.0" velocity="0.01"/>
+		<dynamics damping="0.001" friction="0.001"/>
+	</joint>
+	<joint name="${trailer_name}_connector_to_${trailer_name}_base_link" type="fixed">
+		<parent link="${trailer_name}_connector" />
+		<child link="${trailer_name}_base_link" />
+		<origin xyz="-1 0 0" rpy="0 0 0" />
+	</joint>
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_left" mass="0.001" length="0.1" radius="0.05" ox="0.0" oy="0.32" oz="-0.0" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<xacro:default_zylinder_in_Y parent="${trailer_name}_base_link" child_name="${trailer_name}_wheel_support_right" mass="0.001" length="0.1" radius="0.05" ox="0.0" oy="-0.32" oz="-0.0" roll="1.57" yaw="0.0" pitch="0.0" color="White" />
+	<link name="${trailer_name}_left_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.05" radius="0.114" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.05" radius="0.114" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</collision>
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.114" height="0.01" />
+	</link>
+	<joint name="${trailer_name}_wheel_shaft_to_left_wheel" type="continuous">
+		<parent link="${trailer_name}_wheel_support_left" />
+		<child link="${trailer_name}_left_wheel" />
+		<origin xyz="0 0.095 0" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+	</joint>
+	<link name="${trailer_name}_right_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="0.05" radius="0.114" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.05" radius="0.114" />
+			</geometry>
+			<origin xyz="0 0 0" rpy="1.57 0 0" />
+		</collision>
+		<xacro:inertial_zylinder_y mass="0.01" radius="0.114" height="0.05" />
+	</link>
+	<joint name="${trailer_name}_wheel_shaft_to_right_wheel" type="continuous">
+		<parent link="${trailer_name}_wheel_support_right" />
+		<child link="${trailer_name}_right_wheel" />
+		<origin xyz="0 -0.095 0" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+	</joint>
+	<gazebo reference="${trailer_name}_left_wheel" >
+      <mu1 value="${mu1}"/>
+      <mu2 value="${mu2}"/>
+      <kp value="${kp}" />
+      <kd value="${kd}" />
+      <material>Gazebo/DarkGray</material>
+    </gazebo>	
+    <gazebo reference="${trailer_name}_right_wheel" >
+      <mu1 value="${mu1}"/>
+      <mu2 value="${mu2}"/>
+      <kp value="${kp}" />
+      <kd value="${kd}" />
+      <material>Gazebo/DarkGray</material>
+    </gazebo>		
+  </xacro:macro>
 
 <!-- ////////////////////////////// Lidar ////////////////////////////// -->
 
@@ -201,7 +334,7 @@
   	<gazebo reference="${lidar_name}">
       <sensor type="ray" name="head_hokuyo_sensor">
         <pose>0 0 0 0 0 0</pose>
-	<visualize>false</visualize>
+		<visualize>true</visualize>
       	<update_rate>${update_rate}</update_rate>
       	<ray>
           <scan>
@@ -234,49 +367,75 @@
       </sensor>
     </gazebo>
   </xacro:macro>
+	<!-- /////////////////////////////////////////////////////////////////// -->
 
-<!-- /////////////////////////////////////////////////////////////////// -->
-
-<!-- ////////////////////////////// IMU ////////////////////////////// -->
-
-  <xacro:macro name="imu_sensor" params="parent imu_name mass sizex sizey sizez ox oy oz update_rate update_rateHz noise" >
+	<!-- ////////////////////////////// IMU ////////////////////////////// -->
+  <xacro:macro name="imu_sensor" params="parent imu_name imu_topic mass sizex sizey sizez ox oy oz update_rate noise" >
     <link name="${imu_name}">
+	<visual>
+		<geometry>
+			<box size="${sizex} ${sizey} ${sizez}"/>
+		</geometry>
+		<material name="White"/>
+	</visual>
+	<xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
+    </link>
+	<joint name="${parent}_to_${imu_name}" type="fixed">
+		<parent link="${parent}"/>
+		<child link="${imu_name}"/>
+		<origin xyz="${ox} ${oy} ${oz}"/>
+	</joint>
+	<gazebo reference="${imu_name}">
+		<material>Gazebo/White</material>
+		<gravity>true</gravity>
+		<sensor name="${imu_name}_sensor" type="imu">
+			<always_on>true</always_on>
+			<update_rate>${update_rate}</update_rate>
+			<visualize>true</visualize>
+			<topic>${imu_topic}</topic>
+			<plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+				<topicName>${imu_topic}</topicName>
+				<bodyName>${imu_name}</bodyName>
+				<updateRate>${update_rate}</updateRate>
+				<gaussianNoise>${noise}</gaussianNoise>
+				<xyzOffset>0 0 0</xyzOffset>
+				<rpyOffset>0 0 0</rpyOffset>
+				<frameName>${imu_name}</frameName>
+			</plugin>
+			<pose>0 0 0 0 0 0</pose>
+		</sensor>
+	</gazebo>
+  </xacro:macro>
+	<!-- ///////////////////////////////////////////////////////////////// -->
+	<!-- ////////////////////////////GPS SENSORS//////////////////////////// -->
+  <xacro:macro name="gps_sensor" params="parent gps_name gps_topic mass sizex sizey sizez ox oy oz update_rate initial_latitude initial_longitude noise">
+	<link name="${gps_name}">
 	  <visual>
 	    <geometry>
 	      <box size="${sizex} ${sizey} ${sizez}"/>
 		</geometry>
-	    <material name="White"/>
-	  </visual>
-	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" />
-    </link>
-	<joint name="${parent}_to_${imu_name}" type="fixed">
+		<material name="White"/>
+	  </visual>	
+	  <xacro:inertial_box mass="${mass}" x="${sizex}" y="${sizey}" z="${sizez}" ox="0.0" oy="0.0" oz="0.0"/>
+	</link>
+	<joint name="${parent}_to_${gps_name}" type="fixed">
 	  <parent link="${parent}"/>
-	  <child link="${imu_name}"/>
+	  <child link="${gps_name}"/>
 	  <origin xyz="${ox} ${oy} ${oz}"/>
 	</joint>
-        <!-- maybe switch to the Hector version of the IMU -->
-    <gazebo reference="${imu_name}">
-      <material>Gazebo/White</material>
-	  <gravity>true</gravity>
-	  <sensor name="${imu_name}_sensor" type="imu">
-	    <always_on>true</always_on>
-	    <update_rate>${update_rate}</update_rate>
-	    <visualize>true</visualize>
-	    <topic>__default_topic__</topic>
-  		<plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-		  <topicName>imu</topicName>
-                  <bodyName>${imu_name}</bodyName>
-		  <updateRateHZ>${update_rateHz}</updateRateHZ>
-                  <gaussianNoise>${noise}</gaussianNoise>
-		  <xyzOffset>0 0 0</xyzOffset>
-		  <rpyOffset>0 0 0</rpyOffset>
-                  <frameName>${imu_name}</frameName>
-	    </plugin>
-	    <pose>0 0 0 0 0 0</pose>
-	  </sensor>
-    </gazebo>
-  </xacro:macro>
-
-<!-- ///////////////////////////////////////////////////////////////// -->
-
+	<gazebo>
+		<plugin filename="libhector_gazebo_ros_gps.so" name="gps_plugin">
+			<updateRate>${update_rate}</updateRate>
+			<bodyName>${gps_name}</bodyName>
+			<frameId>${gps_name}</frameId>
+			<topicName>${gps_topic}</topicName>
+			<velocityTopicName>navsat/vel</velocityTopicName>
+			<referenceLatitude>${initial_latitude}</referenceLatitude>
+			<referenceLongitude>${initial_longitude}</referenceLongitude>
+			<referenceHeading>0</referenceHeading>
+			<referenceAltitude>0</referenceAltitude>
+			<gaussianNoise>${noise}</gaussianNoise>
+		</plugin>
+	</gazebo>
+	</xacro:macro>
 </robot>

@@ -1,8 +1,9 @@
 <launch>
     <node name="beaverbot_control_node" pkg="beaverbot_control" type="beaverbot_control_node" output="screen">
-        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/global_trajectory.csv"/>
+        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/l_shape_0.3.csv"/>
         <param name="~sampling_time" value="0.05"/>
-        <param name="~controller_type" value="feedforward"/>
-        <param name="~is_derivative" value="true"/>
+        <param name="~controller_type" value="pure_pursuit"/>
+        <param name="~trajectory_type" value="derivative"/>
+        <remap from="cmd_vel" to="/beaverbot/cmd_vel"/>
     </node>
 </launch>

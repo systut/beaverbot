@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{serial}=="AI05CZGB", SYMLINK+="driver", MODE="0666"

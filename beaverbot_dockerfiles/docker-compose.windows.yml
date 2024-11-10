@@ -23,3 +23,18 @@ services:
     tty: True
     stdin_open: True
     command: bash
+
+  # robot_communication:
+  #   user: root
+  #   depends_on: 
+  #     - ros-master
+  #   image: beaverbot:melodic
+  #   build:
+  #     context: ..
+  #     dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
+  #   container_name: beaverbot_communication
+  #   privileged: True
+  #   network_mode: host
+  #   tty: True
+  #   stdin_open: True
+  #   command: bash

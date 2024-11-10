@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2b72", ATTRS{serial}=="9AXIS-00", SYMLINK+="imu", MODE="0666"
