@@ -1,7 +1,7 @@
 <launch>
     <arg name="simulation" default="true" />
     <arg name="coverage_length" default="4"/>
-    <arg name="coverage_width" default="10"/>
+    <arg name="coverage_width" default="6"/>
     <arg name="coverage_iteration" default="2"/>
     <arg name="rvizconfig" default="$(find beaverbot_description)/rviz/urdf.rviz"/>
     <arg name="model" default="$(find beaverbot_description)/urdf/beaverbot.urdf.xacro"/>
@@ -29,6 +29,15 @@
     <group unless = "$(arg simulation)">
         <include file="$(find beaverbot_launch)/launch/sensors.launch">
         </include>
+
+        <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" output="screen" required="true" >
+          <param name="~log" value="false"/>
+          <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
+          <param name="~publish_rate" value="0.1"/>
+          <param name="~rotation_angle" value="-90"/>
+          <param name="~gps_to_rear_axis" value="0.0"/>
+          <param name="~imu_offset" value="-0.18981711362095213"/>
+        </node>
     </group>
 
     <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true" output="screen">

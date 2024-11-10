@@ -32,10 +32,10 @@ int main(int argc, char **argv)
     ros::param::param<int>("~iteration", iteration, 2);
 
     double length;
-    ros::param::param<double>("~length", length, 13.0);
+    ros::param::param<double>("~length", length, 6.0);
 
     double width;
-    ros::param::param<double>("~width", width, 13.0);
+    ros::param::param<double>("~width", width, 4.0);
 
     Eigen::MatrixXd coverage_path;
 
