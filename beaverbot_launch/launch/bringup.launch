@@ -50,5 +50,7 @@
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
 
+    <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
+
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 </launch>
