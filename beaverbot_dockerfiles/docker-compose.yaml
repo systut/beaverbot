@@ -36,7 +36,7 @@ services:
       "source /opt/ros/noetic/setup.bash &&
       source /root/catkin_ws/devel/setup.bash &&
       sleep 2 &&
-      roslaunch beaverbot_launch navigation.launch"
+      roslaunch beaverbot_launch bringup.launch"
 
 
   robot_communication:

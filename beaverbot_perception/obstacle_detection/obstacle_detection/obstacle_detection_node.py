@@ -32,14 +32,6 @@ class ObstacleDetectionNode(object):
 
         self._register_subscribers()
 
-        self.lidar_sub = rospy.Subscriber(
-            "/scan", LaserScan, self._lidar_callback)
-
-        self.emergency_stop_publisher = rospy.Publisher(
-            "emergency_stop", Bool, queue_size=10)
-
-        self.obstacle_threshold = 2.0
-
         self.emergency_stop_signal = Bool()
 
         self.emergency_stop_signal.data = False
@@ -64,7 +56,7 @@ class ObstacleDetectionNode(object):
     def _read_parameters(self):
         """! Read parameters
         """
-        self.obstacle_threshold = rospy.get_param("~obstacle_threshold", 2.0)
+        self.obstacle_threshold = rospy.get_param("~obstacle_threshold", 0.1)
 
     def _register_publishers(self):
         """! Register publishers
