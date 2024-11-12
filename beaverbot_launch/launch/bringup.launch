@@ -59,5 +59,7 @@
     
     <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
 
+    <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
+
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 </launch>
