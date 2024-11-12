@@ -31,14 +31,21 @@
         </include>
 
         <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" output="screen" required="true" >
-          <param name="~log" value="false"/>
+          <param name="~log" value="true"/>
           <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
           <param name="~publish_rate" value="0.1"/>
-          <param name="~rotation_angle" value="-90"/>
+          <param name="~rotation_angle" value="85"/>
           <param name="~gps_to_rear_axis" value="0.0"/>
           <param name="~imu_offset" value="-0.18981711362095213"/>
+          <param name="~imu_calibration_threshold" value="400"/>
+          <param name="~imu_epsilon" value="0.001"/>
         </node>
     </group>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+        <rosparam command="load" file="$(find beaverbot_launch)/config/laser_filter.yaml" />
+
+    </node>
 
     <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true" output="screen">
       <param name="~iteration" value="${arg coverage_iteration}"/>
@@ -49,6 +56,8 @@
     <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>  
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
+    
+    <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 </launch>
