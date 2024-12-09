@@ -1,7 +1,7 @@
 <launch>
     <arg name="simulation" default="true" />
-    <arg name="coverage_length" default="4"/>
-    <arg name="coverage_width" default="6"/>
+    <arg name="coverage_length" default="13.0"/>
+    <arg name="coverage_width" default="13.0"/>
     <arg name="coverage_iteration" default="2"/>
     <arg name="rvizconfig" default="$(find beaverbot_description)/rviz/urdf.rviz"/>
     <arg name="model" default="$(find beaverbot_description)/urdf/beaverbot.urdf.xacro"/>
@@ -17,7 +17,7 @@
         <include file="$(find beaverbot_launch)/launch/beaverbot_gazebo.launch">
         </include>
 
-        <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" output="screen" required="true" >
+        <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" required="true" >
           <param name="~log" value="false"/>
           <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
           <param name="~publish_rate" value="0.1"/>
@@ -30,7 +30,7 @@
         <include file="$(find beaverbot_launch)/launch/sensors.launch">
         </include>
 
-        <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" output="screen" required="true" >
+        <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" required="true" >
           <param name="~log" value="true"/>
           <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
           <param name="~publish_rate" value="0.1"/>
@@ -47,18 +47,16 @@
 
     </node>
 
-    <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true" output="screen">
-      <param name="~iteration" value="${arg coverage_iteration}"/>
-      <param name="~length" value="${arg coverage_length}"/>
-      <param name="~width" value="${arg coverage_width}"/>
+    <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true">
+      <param name="~iteration" value="$(arg coverage_iteration)"/>
+      <param name="~length" value="$(arg coverage_length)"/>
+      <param name="~width" value="$(arg coverage_width)"/>
     </node>
 
     <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>  
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
     
-    <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
-
     <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
