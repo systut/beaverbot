@@ -49,6 +49,7 @@ class TestDemo3(object):
         """! Test demo 2
         """
         # TODO: Replace the following line with needed speed
+        rospy.loginfo("Move forward for 2 seconds")
         move_forward_speed = 0.5
         self._cmd_vel_message.linear.x = move_forward_speed
         self._cmd_vel_message.angular.z = move_forward_speed
@@ -57,7 +58,7 @@ class TestDemo3(object):
 
         # TODO: Replace the following line with rospy.sleep(5.0)
         rospy.sleep(2.0)
-
+        rospy.loginfo("Avoid the obstacle")
         sampling_time = 0.2
 
         for i in range(len(self._trajectory.t)):
@@ -68,6 +69,7 @@ class TestDemo3(object):
 
             rospy.sleep(sampling_time)
 
+        rospy.loginfo("Stop")
         self._cmd_vel_message.linear.x = 0.0
         self._cmd_vel_message.angular.z = 0.0
 
