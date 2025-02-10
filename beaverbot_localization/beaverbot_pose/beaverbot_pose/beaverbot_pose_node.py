@@ -73,14 +73,14 @@ class BeaverbotPoseNode:
             "~publish_rate", 0.1)
 
         self._gps_to_rear_axis = rospy.get_param(
-            "~gps_to_rear_axis", 0.6)
+            "~gps_to_rear_axis", 0.0)
 
         self._imu_offset = rospy.get_param(
             "~imu_offset", 0.0)
-        
+
         self._imu_epsilon = rospy.get_param(
             "~imu_epsilon", 0.0001)
-        
+
         self._imu_calibration_threshold = rospy.get_param(
             "~imu_calibration_threshold", 200)
 
@@ -171,7 +171,7 @@ class BeaverbotPoseNode:
 
         subtracted_values = []
 
-        while not rospy.is_shutdown() and (time.time() - start_time < 30):
+        while not rospy.is_shutdown() and (time.time() - start_time < 1):
             try:
                 data = rospy.wait_for_message(
                     "/imu/data_raw", Imu, timeout=1.0)
@@ -261,9 +261,9 @@ class BeaverbotPoseNode:
 
         self._yaw = math.atan2(math.sin(self._yaw), math.cos(self._yaw))
 
-        # (self.quaternion_x, self.quaternion_y,
-        #  self.quaternion_z, self.quaternion_w) = tf.transformations. \
-        #     quaternion_from_euler(0, 0, self._yaw)
+        (self.quaternion_x, self.quaternion_y,
+         self.quaternion_z, self.quaternion_w) = tf.transformations. \
+            quaternion_from_euler(0, 0, self._yaw)
 
     def _publish_rear_wheel_odometry(self, timer):
         """! Publish rear wheel pose method

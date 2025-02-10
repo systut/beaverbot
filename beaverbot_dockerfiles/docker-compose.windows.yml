@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  ros-master:
-    image: ros:noetic-ros-core
-    container_name: ros-master
-    command: stdbuf -o L roscore
-    network_mode: host
+  # ros-master:
+  #   image: ros:noetic-ros-core
+  #   container_name: ros-master
+  #   command: stdbuf -o L roscore
+  #   network_mode: host
     
   beaverbot:
     user: root
-    depends_on: 
-      - ros-master
+    # depends_on: 
+    #   - ros-master
     image: beaverbot:windows
     build:
       context: ..

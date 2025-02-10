@@ -44,20 +44,21 @@
 
     <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
         <rosparam command="load" file="$(find beaverbot_launch)/config/laser_filter.yaml" />
-
     </node>
 
-    <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true">
+    <!-- <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true">
       <param name="~iteration" value="$(arg coverage_iteration)"/>
       <param name="~length" value="$(arg coverage_length)"/>
       <param name="~width" value="$(arg coverage_width)"/>
-    </node>
+    </node> -->
 
     <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>  
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
     
     <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
+
+    <!-- <node name="laserscan2costmap" pkg="laserscan2costmap" type="laserscan2costmap" output="screen"/> -->
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
 </launch>

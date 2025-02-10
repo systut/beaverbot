@@ -22,7 +22,7 @@ class PurePursuit:
     autonomous driving.
     """
 
-    lookahead_distance = 1.5
+    lookahead_distance = 1.0
 
     lookahead_gain = 0.1
 
