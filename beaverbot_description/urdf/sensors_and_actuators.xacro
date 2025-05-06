@@ -181,12 +181,14 @@
 			<geometry>
 				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
 			</geometry>
+			<material name="Gray"/>
 			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
 		</visual>
 		<collision>
 			<geometry>
 				<mesh filename="package://beaverbot_description/meshes/cleaner.stl" scale="0.001 0.001 0.001"/>
 			</geometry>
+			<material name="Gray"/>
 			<origin rpy="1.57 0 -1.57" xyz="-0.15 0.4 -0.05" />
 		</collision>
 		<xacro:inertial_box mass="0.001" x="0.01" y="0.01" z="0.01" ox="-0.15" oy="0.4" oz="-0.05"/>
@@ -334,7 +336,7 @@
   	<gazebo reference="${lidar_name}">
       <sensor type="ray" name="head_hokuyo_sensor">
         <pose>0 0 0 0 0 0</pose>
-		<visualize>true</visualize>
+		<visualize>false</visualize>
       	<update_rate>${update_rate}</update_rate>
       	<ray>
           <scan>

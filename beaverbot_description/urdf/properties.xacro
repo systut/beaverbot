@@ -48,7 +48,7 @@
   <xacro:property name="lidar_length" value="0.04" />
   <xacro:property name="lidar_radius" value="0.0325" />
   <xacro:property name="lidar_min_range" value="0.15" />
-  <xacro:property name="lidar_max_range" value="8.0" />
+  <xacro:property name="lidar_max_range" value="100.0" />
   <xacro:property name="lidar_stdv" value="0.01" />
   <xacro:property name="lidar_range_resolution" value="0.01" />
   <xacro:property name="lidar_min_angle" value="0.0" />
@@ -69,7 +69,7 @@
   <xacro:property name="kp" value="10000000.0" />
   <xacro:property name="kd" value="1.0" />
   
-  <xacro:property name="use_trailer" value="true" />
+  <xacro:property name="use_trailer" value="false" />
   <!-- ///////////////////////////////////////////////////////////// -->
   
 </robot>

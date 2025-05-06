@@ -49,7 +49,7 @@ class BeaverbotPoseNode:
 
         self._register_subscribers()
 
-        # self._register_log_data()
+        self._register_log_data()
 
         rospy.sleep(1)
 
@@ -73,10 +73,16 @@ class BeaverbotPoseNode:
             "~publish_rate", 0.1)
 
         self._gps_to_rear_axis = rospy.get_param(
-            "~gps_to_rear_axis", 0.6)
+            "~gps_to_rear_axis", 0.0)
 
         self._imu_offset = rospy.get_param(
             "~imu_offset", 0.0)
+
+        self._imu_epsilon = rospy.get_param(
+            "~imu_epsilon", 0.0001)
+
+        self._imu_calibration_threshold = rospy.get_param(
+            "~imu_calibration_threshold", 200)
 
     def _register_subscribers(self):
         """! Register ROS subscribers method
@@ -111,24 +117,24 @@ class BeaverbotPoseNode:
             rospy.Timer(rospy.Duration(self._publish_rate),
                         self._log_pose)
 
-    # def _register_log_data(self):
-    #     """! Register log localization data method
-    #     """
-    #     self._log_start_time = None
+    def _register_log_data(self):
+        """! Register log localization data method
+        """
+        self._log_start_time = None
 
-    #     log_folder = rospy.get_param("~log_folder", None)
+        # log_folder = rospy.get_param("~log_folder", None)
 
-    #     current_time = datetime.now(pytz.timezone('Asia/Tokyo')).strftime(
-    #         "position_log_%Y%m%d_%H-%M")
+        # current_time = datetime.now(pytz.timezone('Asia/Tokyo')).strftime(
+        #     "position_log_%Y%m%d_%H-%M")
 
-    #     self._file_name = os.path.join(
-    #         log_folder, current_time + ".csv")
+        # self._file_name = os.path.join(
+        #     log_folder, current_time + ".csv")
 
-    #     with open(self._file_name, mode="a") as f:
+        # with open(self._file_name, mode="a") as f:
 
-    #         title = "Time (s), x_rear(m), y_rear(m), yaw(deg)\n"
+        #     title = "Time (s), x_rear(m), y_rear(m), yaw(deg)\n"
 
-    #         f.write(title)
+        #     f.write(title)
 
     def _get_initial_pose(self):
         """! Get initial pose method
@@ -144,14 +150,68 @@ class BeaverbotPoseNode:
 
         self._initial_lon = first_gps_mess.longitude
 
+    # def _get_initial_orientation(self):
+    #     """! Get initial orientation
+    #     THis method will guarantee that data from IMU is received before
+    #     the robot start moving
+    #     """
+    #     rospy.wait_for_message('/imu/data_raw', Imu, timeout=10)
+
+    #     rospy.loginfo("IMU Data Received")
+
     def _get_initial_orientation(self):
         """! Get initial orientation
         THis method will guarantee that data from IMU is received before
         the robot start moving
         """
-        rospy.wait_for_message('/imu/data_raw', Imu, timeout=10)
 
-        rospy.loginfo("IMU Data Received")
+        start_time = time.time()
+
+        imu_data = []
+
+        subtracted_values = []
+
+        while not rospy.is_shutdown() and (time.time() - start_time < 1):
+            try:
+                data = rospy.wait_for_message(
+                    "/imu/data_raw", Imu, timeout=1.0)
+
+                euler = tf.transformations.euler_from_quaternion(
+                    [data.orientation.x,
+                     data.orientation.y,
+                     data.orientation.z,
+                     data.orientation.w])
+
+                imu_data.append(euler[2])
+
+                if len(imu_data) > 1:
+                    difference = imu_data[-1] - imu_data[-2]
+
+                    subtracted_values.append(difference)
+
+                    if len(subtracted_values) > \
+                            self._imu_calibration_threshold:
+                        subtracted_values.pop(0)
+
+                    if len(subtracted_values) == \
+                            self._imu_calibration_threshold and \
+                            all(val < self._imu_epsilon for val
+                                in subtracted_values):
+                        rospy.loginfo(
+                            "Breaking out: last 200 differences are zero.")
+
+                        self._imu_offset = euler[2]
+
+                        break
+
+                rospy.loginfo("Calibrating IMU ...")
+
+            except rospy.ROSException:
+                rospy.logwarn("No IMU message received within timeout.")
+
+            self._yaw = 0.0
+
+        rospy.loginfo("IMU data received.")
 
     def _gps_callback(self, data: NavSatFix):
         """! GPS callback method
@@ -191,13 +251,13 @@ class BeaverbotPoseNode:
         self.linear_acceleration_y = data.linear_acceleration.y
         self.linear_acceleration_z = data.linear_acceleration.z
 
-        self.euler = tf.transformations.euler_from_quaternion(
+        euler = tf.transformations.euler_from_quaternion(
             [self.quaternion_x,
              self.quaternion_y,
              self.quaternion_z,
              self.quaternion_w])
 
-        self._yaw = self.euler[2] - self._imu_offset
+        self._yaw = euler[2] - self._imu_offset
 
         self._yaw = math.atan2(math.sin(self._yaw), math.cos(self._yaw))
 
@@ -245,14 +305,14 @@ class BeaverbotPoseNode:
 
         elapsed_time = (time.time() - self._log_start_time)
 
-        pose = f"{elapsed_time}, {self._x_rear}, "
-        f"{self._y_rear}, {math.degrees(self._yaw)}"
+        pose = f"{elapsed_time}, {self._x_rear}, {self._y_rear}, \
+            {math.degrees(self._yaw)}"
 
         rospy.loginfo(f"Pose: {pose}")
 
-        with open(self._file_name, mode="a") as f:
+        # with open(self._file_name, mode="a") as f:
 
-            f.write(pose + "\n")
+        #     f.write(pose + "\n")
 
     def _get_xy_from_latlon(self, lat, long, _initial_lat, _initial_lon):
         """! Get x, y from latitude and longitude method

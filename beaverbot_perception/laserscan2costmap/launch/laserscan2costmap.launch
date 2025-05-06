@@ -1,0 +1,21 @@
+<!-- -->
+<launch>
+    <arg name="resolution" default="0.5" />
+    <arg name="scan_size_x" default="100" />
+    <arg name="scan_size_y" default="100" />
+    <arg name="map_size_x" default="50" />
+    <arg name="map_size_y" default="50" />
+    <arg name="scan_topic" default="/scan_multi" />
+    <arg name="sensor_frame" default="base_link" />
+
+	<node pkg="laserscan2costmap" type="laserscan2costmap" name="laserscan2costmap" output="screen">
+        <param name="resolution" value="$(arg resolution)" />
+        <param name="scan_size_x" value="$(arg scan_size_x)" />
+        <param name="scan_size_y" value="$(arg scan_size_y)" />
+        <param name="map_size_x" value="$(arg map_size_x)" />
+        <param name="map_size_y" value="$(arg map_size_y)" />
+        <param name="scan_topic" value="$(arg scan_topic)" />
+        <param name="sensor_frame" value="$(arg sensor_frame)" />
+	</node>
+
+</launch>
