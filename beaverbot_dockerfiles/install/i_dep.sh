@@ -5,8 +5,8 @@ basic_dep="git \
            nano \
            vim \
            python3-catkin-tools \
-           python3-pip 
-	  "
+           python3-pip \
+           x11-apps"
 
 ros_dep="ros-noetic-tf \
          ros-noetic-robot-state-publisher \

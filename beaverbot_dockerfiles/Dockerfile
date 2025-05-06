@@ -4,9 +4,9 @@ FROM osrf/ros:noetic-desktop-full
 COPY ./beaverbot_dockerfiles/install /root/install
 
 # update and install dependencies
-RUN chmod +x /root/install/*
-
-RUN /bin/sh -e -c /root/install/i_dep.sh
+RUN chmod +x /root/install/* && \
+    sed -i 's/\r$//' /root/install/* && \
+    /bin/sh -e -c /root/install/i_dep.sh
 
 # copy directory specific to scart
 COPY ./ /root/catkin_ws/src/
@@ -25,8 +25,7 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y
 
 # Build ROS packages
-RUN catkin config --skiplist beaverbot_driver
-
 RUN . /opt/ros/noetic/setup.bash && \
+    catkin config --skiplist beaverbot_driver && \
     catkin build && \
     echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc

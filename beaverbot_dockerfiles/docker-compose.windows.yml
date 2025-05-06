@@ -1,40 +1,42 @@
 version: '3'
 
 services:
-  # ros-master:
-  #   image: ros:noetic-ros-core
-  #   container_name: ros-master
-  #   command: stdbuf -o L roscore
-  #   network_mode: host
+  ros-master:
+    image: ros:noetic-ros-core
+    container_name: ros-master
+    command: stdbuf -o L roscore
+    network_mode: host
     
   beaverbot:
     user: root
-    # depends_on: 
-    #   - ros-master
-    image: beaverbot:windows
+    depends_on: 
+      - ros-master
+    image: beaverbot:noetic
     build:
       context: ..
-      dockerfile: ./beaverbot_dockerfiles/Dockerfile.windows
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile
     container_name: beaverbot
     volumes:
       - "../:/root/catkin_ws/src/"
+    environment:
+      - DISPLAY=host.docker.internal:0.0
     privileged: True
     network_mode: host
     tty: True
     stdin_open: True
     command: bash
 
-  # robot_communication:
-  #   user: root
-  #   depends_on: 
-  #     - ros-master
-  #   image: beaverbot:melodic
-  #   build:
-  #     context: ..
-  #     dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
-  #   container_name: beaverbot_communication
-  #   privileged: True
-  #   network_mode: host
-  #   tty: True
-  #   stdin_open: True
-  #   command: bash
+  robot_communication:
+    user: root
+    depends_on: 
+      - ros-master
+    image: beaverbot:melodic
+    build:
+      context: ..
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
+    container_name: beaverbot_communication
+    privileged: True
+    network_mode: host
+    tty: True
+    stdin_open: True
+    command: bash
