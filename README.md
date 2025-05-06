@@ -80,7 +80,7 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
 
 ## Manual for running beaverbot 
 
-### Setting up the enviroment
+### Setting up the environment
 
 -----
 
@@ -88,46 +88,87 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
 
   > **! Caution:** This method exposes PC to external source. Therefore, a more secure alternative way is expected for using GUI within Docker containers. This problem was raised in [Using GUI's with Docker](https://wiki.ros.org/es/docker/Tutorials/GUI#:~:text=%2D%2Dpulse.-,Using%20X%20server,-X%20server%20is)
 
-```bash
-#This command is required to run every time the PC is restarted
-xhost + 
-```
-Make a X authentication file with proper permissions for the container to use.
+  **For Linux:**
+  ```bash
+  # This command is required to run every time the PC is restarted
+  xhost + 
+  ```
+  Make a X authentication file with proper permissions for the container to use.
+  ```bash
+  # If not working, try to run "sudo rm -rf /tmp/.docker.xauth" first
+  cd ./src/beaverbot_dockerfiles/
+  chmod +x ./install/xauth.sh && ./install/xauth.sh
+  ```
 
-```bash
-# If not working, try to run "sudo rm -rf /tmp/.docker.xauth" first
-cd ./src/beaverbot_dockerfiles/
-chmod +x ./install/xauth.sh && ./install/xauth.sh
-```
+  **For Windows:**
+  ```powershell
+  # Install VcXsrv or Xming X server
+  # Start X server with these settings:
+  # - Multiple windows
+  # - Display number: 0
+  # - Start no client
+  # - Extra settings: Disable access control
+  ```
 
 * **Install Docker (optional)** 
  
-```bash
-chmod +x ./src/docker_installer.sh && ./src/install_docker.sh
-```
+  **For Linux:**
+  ```bash
+  chmod +x ./src/docker_installer.sh && ./src/install_docker.sh
+  ```
+
+  **For Windows:**
+  ```powershell
+  # Download and install Docker Desktop for Windows from:
+  # https://www.docker.com/products/docker-desktop
+  ```
+
 * **Launch the environment**
   
-Start up
-```bash
-cd ./src/beaverbot_dockerfiles
-docker compose up -d 
-```
+  **For Linux:**
+  ```bash
+  cd ./src/beaverbot_dockerfiles
+  docker compose up -d 
+  ```
 
-Open a container in interactive mode
-```bash
-cd ./src/beaverbot_dockerfiles
-docker compose exec [name-of-container] bash
-```
-To stop containers, run
-```bash
-docker compose down
-```
+  **For Windows:**
+  ```powershell
+  cd .\src\beaverbot_dockerfiles
+  docker compose -f .\docker-compose.windows.yml up -d
+  ```
 
-To commit a container to a new image, run
-```bash
-#Do not do this if you're not familiar with Docker commit action. This changes your docker images.
-docker commit [container-id] [image-name:tag]
-```
+* **Open a container in interactive mode**
+
+  **For Linux:**
+  ```bash
+  cd ./src/beaverbot_dockerfiles
+  docker compose exec [name-of-container] bash
+  ```
+
+  **For Windows:**
+  ```powershell
+  cd .\src\beaverbot_dockerfiles
+  docker compose -f .\docker-compose.windows.yml exec [name-of-container] bash
+  ```
+
+* **Stop containers**
+
+  **For Linux:**
+  ```bash
+  docker compose down
+  ```
+
+  **For Windows:**
+  ```powershell
+  docker compose -f .\docker-compose.windows.yml down
+  ```
+
+* **Commit a container to a new image**
+  ```bash
+  # Do not do this if you're not familiar with Docker commit action. This changes your docker images.
+  docker commit [container-id] [image-name:tag]
+  ```
+
 More other useful Docker's CLI can be found in [Docker CLI cheetsheet](https://docs.docker.com/get-started/docker_cheatsheet.pdf)
 
 ### Starting up the system with hardware
