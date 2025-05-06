@@ -404,7 +404,7 @@ void Global_traj_class::euler_spiral_corner_smoothing_solver() {
          double a_euler_min = WHEEL_AXIS_DIST * sqrt(2 * PI * phi_mid);                   // Minimum allowable Euler scaling factor
          double epsilon_min = a_euler_min * unit_euler_coordinate_mid(1) / sin(beta / 2); // Minimum possible cornering tolerance
         //  epsilon(i) = (std::min(epsilon_max, epsilon_min) + epsilon_max) / 2;  ////////////////////////ALTERED///////////////////
-        epsilon(i) = epsilon_min + 0.1;
+        epsilon(i) = epsilon_min + 0.4;
          Lc(i)      = epsilon(i) * ((sin(beta / 2) / unit_euler_coordinate_mid(1)) * unit_euler_coordinate_mid(0) + cos(beta / 2));   // [m] Euclidian distance
          a_euler(i) = (epsilon(i) * sin(beta / 2)) / unit_euler_coordinate_mid(1);
          Eigen::RowVector2d Lc_check;
