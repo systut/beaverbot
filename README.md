@@ -1,5 +1,5 @@
-# Beavorbot
-A ROS workspace contains essential packages for running Nitrabot with various hardwares. 
+# Beaverbot
+A ROS workspace contains essential packages for running Beaverbot with various hardwares. 
 
 This workspace is partially written by TUT-Systems Engneering Labroratory members and being used only for research purpores.
 
@@ -57,7 +57,7 @@ An Intertial Measurement Unit (IMU) measures and reports body's specific force (
 
 ### Robot control system 
 
-Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is based on two separately driven wheels placed on either side of the robot body. Velocity commands could be sent to robot via the interface device using serial communication.
+Tractor part of Beaverbot is an autonomous mobile robot (AMR) whose movement is based on two separately driven wheels placed on either side of the robot body. Velocity commands could be sent to robot via the interface device using serial communication.
 
  [robot_communication](src/beaverbot_communication/src/beaverbot_communication/robot_communication.cpp) node in [beaverbot_communication](src/beaverbot_communication/) package is responsible for commucating with the robot. The velocity command published on `/cmd_vel` topic will be sent to the robot via interface devices. Concurrently, the rotary encoder data and battery's condition also be published respectively into `/encoder` and `/battery` topics.
 
@@ -79,6 +79,26 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
 *(in progress)*
 
 ## Manual for running beaverbot 
+
+### Cloning the repository
+
+-----
+
+* **Clone the repository and initialize submodules**
+
+  ```bash
+  # Clone the repository
+  git clone https://github.com/systut/beaverbot.git
+  cd beaverbot
+
+  # Initialize and update submodules
+  git submodule update --init
+  ```
+
+  This will download the following submodules:
+  - `beaverbot_sensors/f9p_ichimill` (Ver0.3.0.0) - For F9P GPS receiver
+  - `beaverbot_sensors/rplidar_ros` (2.1.5) - For RPLIDAR
+  - `beaverbot_sensors/rt_usb_9axisimu_driver` (1.0.1) - For RT-USB-9AXIS-IMU
 
 ### Setting up the environment
 
@@ -124,43 +144,34 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
   ```
 
 * **Launch the environment**
-  
-  **For Linux:**
+
   ```bash
+  # For Linux
   cd ./src/beaverbot_dockerfiles
   docker compose up -d 
-  ```
-
-  **For Windows:**
-  ```powershell
-  cd .\src\beaverbot_dockerfiles
-  docker compose -f .\docker-compose.windows.yml up -d
+  # For Windows
+  # cd .\src\beaverbot_dockerfiles
+  # docker compose -f .\docker-compose.windows.yml up -d
   ```
 
 * **Open a container in interactive mode**
 
-  **For Linux:**
   ```bash
+  # For Linux
   cd ./src/beaverbot_dockerfiles
   docker compose exec [name-of-container] bash
-  ```
-
-  **For Windows:**
-  ```powershell
-  cd .\src\beaverbot_dockerfiles
-  docker compose -f .\docker-compose.windows.yml exec [name-of-container] bash
+  # For Windows
+  # cd .\src\beaverbot_dockerfiles
+  # docker compose -f .\docker-compose.windows.yml exec [name-of-container] bash
   ```
 
 * **Stop containers**
 
-  **For Linux:**
   ```bash
+  # For Linux
   docker compose down
-  ```
-
-  **For Windows:**
-  ```powershell
-  docker compose -f .\docker-compose.windows.yml down
+  # For Windows
+  # docker compose -f .\docker-compose.windows.yml down
   ```
 
 * **Commit a container to a new image**
@@ -171,27 +182,38 @@ Tractor part of Nitrabot is an autonomous mobile robot (AMR) whose movement is b
 
 More other useful Docker's CLI can be found in [Docker CLI cheetsheet](https://docs.docker.com/get-started/docker_cheatsheet.pdf)
 
-### Starting up the system with hardware
+### Starting up the system with hardwares
 
 -----
 
 Start the environment
 
 ```bash
+# For Linux
+cd ./src/beaverbot_dockerfiles
 docker compose up -d 
+# For Windows
+# cd .\src\beaverbot_dockerfiles
+# docker compose -f .\docker-compose.windows.yml up -d
 ```
 
 In terminal 1, run the below to enable sending command to robot and get the wheel encoder data
 
 ```bash
+# For Linux
 docker compose exec robot_communication bash
+# For Windows
+# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2, run the below to start collect GPS and IMU sensor data
 
 ```bash
-docker compose exec nitra_robot bash
+# For Linux
+docker compose exec beaverbot bash
+# For Windows
+# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
 roslaunch beaverbot_launch bringup.launch
 ```
 
@@ -202,14 +224,24 @@ roslaunch beaverbot_launch bringup.launch
 In terminal 1 
 
 ```bash
+# For Linux
+cd ./src/beaverbot_dockerfiles
 docker compose up -d 
 docker compose exec robot_communication bash
+# For Windows
+# cd .\src\beaverbot_dockerfiles
+# docker compose -f .\docker-compose.windows.yml up -d
+# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
+
 In terminal 2
 
 ```bash
-docker compose exec nitra_robot bash
+# For Linux
+docker compose exec beaverbot bash
+# For Windows
+# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
 rosrun beaverbot_control feedforward
 ```
 
@@ -220,18 +252,30 @@ rosrun beaverbot_control feedforward
 In terminal 1 
 
 ```bash
+# For Linux
+cd ./src/beaverbot_dockerfiles
 docker compose up -d 
 docker compose exec robot_communication bash
+# For Windows
+# cd .\src\beaverbot_dockerfiles
+# docker compose -f .\docker-compose.windows.yml up -d
+# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2
 
 ```bash
-docker compose exec nitra_robot bash
+# For Linux
+docker compose exec beaverbot bash
+# For Windows
+# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
 roslaunch beaverbot_launch nav_pure_pursuit.launch
 ```
 
 ```bash
+# For Linux
 docker exec -it beaverbot bash -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
+# For Windows
+# docker exec -it beaverbot bash -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
 ```
