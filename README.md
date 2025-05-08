@@ -275,19 +275,25 @@ usbipd list
 ```powershell
 # This is a one-time setup for each device
 # The binding persists across system restarts
-usbipd bind --busid [busid-of-device]
+usbipd bind -i [VID:PID-of-device]
 ```
 
-3. Attach devices to WSL:
+3. Check your WSL distribution:
+```powershell
+wsl --list
+# Make sure 'docker-desktop' is listed in the output
+```
+
+4. Attach devices to WSL:
 ```powershell
 # This needs to be done after each:
 # - System restart
 # - Docker restart
 # - Physical unplug/replug of device
-usbipd attach --wsl docker-desktop --busid [busid-of-device]
+usbipd attach --wsl docker-desktop -i [VID:PID-of-device]
 ```
 
-4. Verify devices are accessible in container:
+5. Verify devices are accessible in container:
 ```bash
 docker compose -f [docker-compose-file] up -d
 docker compose exec beaverbot ls -l /dev
