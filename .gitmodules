@@ -7,3 +7,6 @@
 [submodule "beaverbot_sensors/rplidar_ros"]
 	path = beaverbot_sensors/rplidar_ros
 	url = https://github.com/Slamtec/rplidar_ros
+[submodule "beaverbot_sensors/witmotion_IMU_ros"]
+	path = beaverbot_sensors/witmotion_IMU_ros
+	url = https://github.com/ElettraSciComp/witmotion_IMU_ros.git
