@@ -6,23 +6,25 @@ This workspace is partially written by TUT-Systems Engneering Labroratory member
 <img src=".github/images/beaverbot.jpg" alt="beaverbot"  width="600"/>
 
 ### **Table of contents**
-
-- [beaverbot](#beaverbot)
-    - [**Table of contents**](#table-of-contents)
+- [Beaverbot](#beaverbot)
   - [Hardware Configuration](#hardware-configuration)
     - [GNSS device](#gnss-device)
     - [IMU sensor](#imu-sensor)
     - [LiDAR](#lidar)
     - [Robot control system](#robot-control-system)
   - [Software configuration](#software-configuration)
-    - [Localization \& Mapping](#localization--mapping)
+    - [Localization & Mapping](#localization--mapping)
     - [Path planner](#path-planner)
     - [Path following controller](#path-following-controller)
   - [Manual for running beaverbot](#manual-for-running-beaverbot)
-    - [Setting up the enviroment](#setting-up-the-enviroment)
+    - [Cloning the repository](#cloning-the-repository)
+    - [Setting up the environment](#setting-up-the-environment)
     - [Starting up the system with hardware](#starting-up-the-system-with-hardware)
     - [Scenario 1: Feedforward control](#scenario-1-feedforward-control)
     - [Scenario 2: Feedback control with pure pursuit controller](#scenario-2-feedback-control-with-pure-pursuit-controller)
+    - [USB Device Setup for Windows](#usb-device-setup-for-windows)
+      - [Installation Steps](#installation-steps)
+      - [USB Device Management](#usb-device-management)
 
 
 ## Hardware Configuration
@@ -129,49 +131,35 @@ Tractor part of Beaverbot is an autonomous mobile robot (AMR) whose movement is 
   # - Start no client
   # - Extra settings: Disable access control
   ```
-
+  
 * **Install Docker (optional)** 
  
-  **For Linux:**
   ```bash
+  # For Linux
   chmod +x ./src/docker_installer.sh && ./src/install_docker.sh
-  ```
 
-  **For Windows:**
-  ```powershell
-  # Download and install Docker Desktop for Windows from:
-  # https://www.docker.com/products/docker-desktop
+  # For Windows: Download and install Docker Desktop from https://www.docker.com/products/docker-desktop
   ```
 
 * **Launch the environment**
+  > **Note**: For Windows users, to use USB devices (GPS, IMU, LiDAR), please follow the [USB Device Setup instructions](#usb-device-setup-for-windows) at the end of this file before launching the environment.
 
   ```bash
-  # For Linux
-  cd ./src/beaverbot_dockerfiles
-  docker compose up -d 
-  # For Windows
-  # cd .\src\beaverbot_dockerfiles
-  # docker compose -f .\docker-compose.windows.yml up -d
+  cd .\src\beaverbot_dockerfiles
+  docker compose -f [docker-compose-file] up -d
   ```
 
 * **Open a container in interactive mode**
 
   ```bash
-  # For Linux
-  cd ./src/beaverbot_dockerfiles
-  docker compose exec [name-of-container] bash
-  # For Windows
-  # cd .\src\beaverbot_dockerfiles
-  # docker compose -f .\docker-compose.windows.yml exec [name-of-container] bash
+  cd .\src\beaverbot_dockerfiles
+  docker compose -f [docker-compose-file] exec [name-of-container] bash
   ```
 
 * **Stop containers**
 
   ```bash
-  # For Linux
-  docker compose down
-  # For Windows
-  # docker compose -f .\docker-compose.windows.yml down
+  docker compose -f [docker-compose-file] down
   ```
 
 * **Commit a container to a new image**
@@ -189,31 +177,21 @@ More other useful Docker's CLI can be found in [Docker CLI cheetsheet](https://d
 Start the environment
 
 ```bash
-# For Linux
-cd ./src/beaverbot_dockerfiles
-docker compose up -d 
-# For Windows
-# cd .\src\beaverbot_dockerfiles
-# docker compose -f .\docker-compose.windows.yml up -d
+cd .\src\beaverbot_dockerfiles
+docker compose -f [docker-compose-file] up -d
 ```
 
 In terminal 1, run the below to enable sending command to robot and get the wheel encoder data
 
 ```bash
-# For Linux
-docker compose exec robot_communication bash
-# For Windows
-# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
+docker compose -f [docker-compose-file] exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2, run the below to start collect GPS and IMU sensor data
 
 ```bash
-# For Linux
-docker compose exec beaverbot bash
-# For Windows
-# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
+docker compose -f [docker-compose-file] exec beaverbot bash
 roslaunch beaverbot_launch bringup.launch
 ```
 
@@ -224,24 +202,16 @@ roslaunch beaverbot_launch bringup.launch
 In terminal 1 
 
 ```bash
-# For Linux
 cd ./src/beaverbot_dockerfiles
-docker compose up -d 
-docker compose exec robot_communication bash
-# For Windows
-# cd .\src\beaverbot_dockerfiles
-# docker compose -f .\docker-compose.windows.yml up -d
-# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
+docker compose -f [docker-compose-file] up -d 
+docker compose -f [docker-compose-file] exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2
 
 ```bash
-# For Linux
-docker compose exec beaverbot bash
-# For Windows
-# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
+docker compose -f [docker-compose-file] exec beaverbot bash
 rosrun beaverbot_control feedforward
 ```
 
@@ -252,30 +222,80 @@ rosrun beaverbot_control feedforward
 In terminal 1 
 
 ```bash
-# For Linux
 cd ./src/beaverbot_dockerfiles
-docker compose up -d 
-docker compose exec robot_communication bash
-# For Windows
-# cd .\src\beaverbot_dockerfiles
-# docker compose -f .\docker-compose.windows.yml up -d
-# docker compose -f .\docker-compose.windows.yml exec robot_communication bash
+docker compose -f [docker-compose-file] up -d 
+docker compose -f [docker-compose-file] exec robot_communication bash
 roslaunch beaverbot_communication beaverbot_communication.launch
 ```
 
 In terminal 2
 
 ```bash
-# For Linux
-docker compose exec beaverbot bash
-# For Windows
-# docker compose -f .\docker-compose.windows.yml exec beaverbot bash
+docker -f [docker-compose-file] compose exec beaverbot bash
 roslaunch beaverbot_launch nav_pure_pursuit.launch
 ```
 
+In terminal 3
 ```bash
-# For Linux
-docker exec -it beaverbot bash -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
-# For Windows
-# docker exec -it beaverbot bash -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
+docker -f [docker-compose-file] compose exec beaverbot -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
 ```
+
+## USB Device Setup for Windows
+
+### Installation Steps
+
+-----
+
+1. Install USBIPD-WIN:
+```powershell
+winget install --interactive --exact dorssel.usbipd-win
+```
+
+2. Add USBIPD-WIN to system PATH:
+```powershell
+$env:Path += ";C:\Program Files\usbipd-win"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::User)
+```
+
+3. **Important**: Close and reopen your terminal for PATH changes to take effect
+
+### USB Device Management
+
+-----
+
+1. List available USB devices:
+```powershell
+# Shows device states:
+# - Not shared: Device is available in Windows but not shared with WSL
+# - Shared: Device is bound and ready to be attached to WSL  
+# - Attached: Device is currently connected to WSL
+usbipd list
+```
+
+2. **Run PowerShell as Administrator** and bind your devices:
+```powershell
+# This is a one-time setup for each device
+# The binding persists across system restarts
+usbipd bind -i [VID:PID-of-device]
+```
+
+3. Check your WSL distribution:
+```powershell
+wsl --list
+# Make sure 'docker-desktop' is listed in the output
+```
+
+4. Attach devices to WSL:
+```powershell
+# This needs to be done after each:
+# - System restart
+# - Docker restart
+# - Physical unplug/replug of device
+usbipd attach --wsl docker-desktop -i [VID:PID-of-device]
+```
+
+5. Verify devices are accessible in container:
+```bash
+docker compose -f [docker-compose-file] up -d
+docker compose exec beaverbot ls -l /dev
+```
+
