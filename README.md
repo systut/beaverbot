@@ -278,12 +278,13 @@ usbipd list
 usbipd bind -i [VID:PID-of-device]
 ```
 
-3. Check your WSL distribution and load USB driver (required for CH340/CH341 USB devices):
+3. Check your WSL distribution and load USB drivers for kernel:
 ```powershell
 wsl --list
 # Make sure 'docker-desktop' is listed in the output
 wsl -d docker-desktop
 modprobe ch341 
+modprobe cp210x
 exit
 ```
 
