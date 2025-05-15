@@ -1,7 +1,6 @@
 <launch>
-    <arg name="lidar_port" default="/dev/ttyUSB1"/>
+    <arg name="lidar_port" default="/dev/lidar"/>
     <arg name="lidar_baud" default="256000"/>
-    <arg name="robot_port" default="/dev/driver" />
     <arg name="gnss_port" default="/dev/gps" />
     <arg name="imu_port" default="/dev/imu" />
 
@@ -17,6 +16,8 @@
         <arg name="port" value="$(arg gnss_port)" />
     </include>
 
-    <include file="$(find tsnd5_driver)/launch/tsnd5_driver.launch">
+    <include file="$(find witmotion_ros)/launch/witmotion_node.launch">
+        <arg name="config" value="$(find beaverbot_launch)/config/hwt905.yaml" />
+        <arg name="port" value="$(arg imu_port)" />
     </include>
 </launch>
