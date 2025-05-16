@@ -6,8 +6,7 @@ basic_dep="git \
            vim \
            python3-catkin-tools \
            python3-pip \
-           x11-apps \
-           udev"
+           x11-apps"
 
 ros_dep="ros-noetic-tf \
          ros-noetic-robot-state-publisher \
@@ -38,6 +37,3 @@ apt-get clean -y
 python3 -m pip install $python_dep
 python3 -m pip install setuptools --upgrade
 python3 -m pip install importlib_metadata --force-reinstall
-
-# Register USB rules
-./rules/register.sh
