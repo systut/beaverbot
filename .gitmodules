@@ -1,12 +1,12 @@
 [submodule "beaverbot_sensors/rt_usb_9axisimu_driver"]
 	path = beaverbot_sensors/rt_usb_9axisimu_driver
 	url = https://github.com/rt-net/rt_usb_9axisimu_driver
-[submodule "beaverbot_sensors/f9p_ichimill"]
-	path = beaverbot_sensors/f9p_ichimill
-	url = https://github.com/terakenxx/f9p_ichimill
 [submodule "beaverbot_sensors/rplidar_ros"]
 	path = beaverbot_sensors/rplidar_ros
 	url = https://github.com/Slamtec/rplidar_ros
 [submodule "beaverbot_sensors/witmotion_ros"]
 	path = beaverbot_sensors/witmotion_ros
 	url = https://github.com/ElettraSciComp/witmotion_IMU_ros.git
+[submodule "beaverbot_sensors/f9p_ichimill"]
+	path = beaverbot_sensors/f9p_ichimill
+	url = https://github.com/Cylos9/f9p_ichimill.git
