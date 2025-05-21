@@ -285,6 +285,7 @@ wsl --list
 wsl -d docker-desktop
 modprobe ch341 
 modprobe cp210x
+modprobe ftdi_sio
 exit
 ```
 
