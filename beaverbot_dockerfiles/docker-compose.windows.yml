@@ -27,7 +27,7 @@ services:
     stdin_open: True
     command: bash
 
-  robot_communication:
+  beaverbot-communication:
     user: root
     depends_on: 
       - ros-master
@@ -35,7 +35,9 @@ services:
     build:
       context: ..
       dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
-    container_name: beaverbot_communication
+    container_name: beaverbot-communication
+    volumes:
+      - "/dev:/dev"
     privileged: True
     network_mode: host
     tty: True
