@@ -1,23 +1,34 @@
 <launch>
+    <arg name="lidar_enabled" default="true" />
+    <arg name="gnss_enabled" default="true" />
+    <arg name="imu_enabled" default="true" />
+
+    <!-- Ports -->
     <arg name="lidar_port" default="/dev/lidar"/>
     <arg name="lidar_baud" default="256000"/>
     <arg name="gnss_port" default="/dev/gps" />
     <arg name="imu_port" default="/dev/imu" />
+    <arg name="imu_baud" default="115200" />
 
-    <node name="lidar_node"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <!-- Lidar -->
+    <node if="$(arg lidar_enabled)" name="lidar_node" pkg="rplidar_ros"  type="rplidarNode" output="screen">
         <param name="serial_port"         type="string" value="$(arg lidar_port)"/>
         <param name="serial_baudrate"     type="int"    value="$(arg lidar_baud)"/>
         <param name="frame_id"            type="string" value="laser"/>
-        <param name="inverted"            type="bool"   value="false"/>
+    <param name="inverted"            type="bool"   value="false"/>
         <param name="angle_compensate"    type="bool"   value="true"/>
     </node>
 
-    <include file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
+    <!-- GNSS -->
+    <include if="$(arg gnss_enabled)" file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
         <arg name="port" value="$(arg gnss_port)" />
     </include>
 
-    <include file="$(find witmotion_ros)/launch/witmotion_node.launch">
-        <arg name="config" value="$(find beaverbot_launch)/config/hwt905.yaml" />
-        <arg name="port" value="$(arg imu_port)" />
-    </include>
+    <!-- IMU -->
+    <node if="$(arg imu_enabled)" name="witmotion_imu" pkg="witmotion_ros"  type="witmotion_ros_node" output="screen">
+        <rosparam command="load" file="$(find beaverbot_launch)/config/hwt905.yaml" />
+        <param name="port" value="$(arg imu_port)" />
+        <param name="baud_rate" value="$(arg imu_baud)" />
+    </node>
+
 </launch>
