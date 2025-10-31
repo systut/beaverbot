@@ -39,11 +39,12 @@ class PurePursuit:
 
         self.old_nearest_point_index = None
 
-    def execute(self, state, input, previous_index):
+    def execute(self, state, input, previous_index, delta_t):
         """! Execute the controller
         @param state<list>: The state of the vehicle
         @param input<list>: The input of the vehicle
         @param previous_index<int>: The previous index
+        @param delta_t<float>: The time step
         @return<tuple>: The status and control
         """
         status = True

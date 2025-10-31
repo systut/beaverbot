@@ -26,11 +26,12 @@ class FeedForward:
         """
         self.trajectory = trajectory
 
-    def execute(self, state, input, index):
+    def execute(self, state, input, index, delta_t):
         """! Execute the controller
         @param state<list>: The state of the vehicle
         @param input<list>: The input of the vehicle
         @param index<int>: The index
+        @param delta_t<float>: The time step
         @return<tuple>: The status and control
         """
         status = True
