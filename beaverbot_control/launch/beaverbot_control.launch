@@ -4,8 +4,8 @@
         <param name="~sampling_time" value="0.05"/>
         <param name="~controller_type" value="rls_compensator"/>
         <param name="~trajectory_type" value="wheel"/>
-        <remap from="cmd_vel" to="/beaverbot/cmd_vel"/>
+        <remap from="cmd_vel" to="/cmd_vel"/>
         <remap from="odom" to="/ground_truth/odom"/>
-        <remap from="imu/data_raw" to="imu/data"/>
+        <remap from="imu/data_raw" to="imu"/>
     </node>
 </launch>

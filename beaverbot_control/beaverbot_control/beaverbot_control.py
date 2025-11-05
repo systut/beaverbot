@@ -151,10 +151,10 @@ class BeaverbotControl(object):
         it has only Imu to read orientation
         """
         quaternion = (
-            msg.pose.pose.orientation.x,
-            msg.pose.pose.orientation.y,
-            msg.pose.pose.orientation.z,
-            msg.pose.pose.orientation.w,
+            msg.orientation.x,
+            msg.orientation.y,
+            msg.orientation.z,
+            msg.orientation.w,
         )
 
         heading = Rotation.from_quat(quaternion).as_euler(
@@ -182,8 +182,6 @@ class BeaverbotControl(object):
         if not status:
             rospy.logwarn("Failed to execute controller")
 
-            return
-
         # if self._is_goal(self._state, self._controller.trajectory):
         #     rospy.loginfo("The vehicle has reached the goal")
 
@@ -191,7 +189,7 @@ class BeaverbotControl(object):
 
         msg = self._convert_control_input_to_msg(u)
 
-        rospy.loginfo(f"Send control input {msg}")
+        # rospy.loginfo(f"Send control input {msg}")
 
         self._velocity_publisher.publish(msg)
 

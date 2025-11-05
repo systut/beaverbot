@@ -11,11 +11,11 @@ services:
     user: root
     depends_on: 
       - ros-master
-    image: beaverbot:noetic
+    image: beaverbot:nura
     build:
       context: ..
       dockerfile: ./beaverbot_dockerfiles/Dockerfile
-    container_name: beaverbot
+    container_name: beaverbot_nura
     volumes:
       - "../:/root/catkin_ws/src/"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
@@ -29,7 +29,14 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    command: bash
+    entrypoint:
+      - bash 
+      - -c
+    command: > 
+      "source /opt/ros/noetic/setup.bash && 
+      source /root/catkin_ws/devel/setup.bash &&
+      sleep 2 &&
+      roslaunch wit_node wit.launch port:=/dev/ttyUSB1"
 
   beaverbot-communication:
     user: root
@@ -46,4 +53,11 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    command: bash
+    entrypoint:
+      - bash 
+      - -c
+    command: > 
+      "source /opt/ros/melodic/setup.bash && 
+      source /root/catkin_ws/devel/setup.bash &&
+      sleep 2 &&
+      roslaunch beaverbot_driver beaverbot_driver.launch"

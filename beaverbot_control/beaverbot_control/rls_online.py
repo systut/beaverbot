@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import rospy
 
 
 #class rls online
@@ -48,6 +49,7 @@ class RLSOnline:
             First calculating the theta difference and the angular velocity 
             """
             yaw_diff= np.array([yaw - yaw_previous])
+            yaw_diff = (yaw_diff + math.pi) % (2 * math.pi) - math.pi  # unwrap to [-pi, pi]
             C = np.array([delta_t * ground_angular_velocity_z ])
             #Calculating L matrix and its inverse
             L_matrix = self.R + np.matmul(C, np.matmul(self.estimationErrorCovarianceMatrices[self.previousTimeStep], C.T))
@@ -58,7 +60,7 @@ class RLSOnline:
 
             #Calculating the estimation error(correction term (yk -Cxk))
             error = (C-yaw_diff) - np.matmul(C, self.estimates[self.previousTimeStep])
-
+            rospy.loginfo(f"Error in RLS: {error}")
             #Calculating the new estimate
             estimate = self.estimates[self.previousTimeStep] + np.matmul(gain_matrix, error)
 
