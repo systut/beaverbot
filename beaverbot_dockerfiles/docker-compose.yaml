@@ -29,14 +29,7 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    entrypoint:
-      - bash 
-      - -c
-    command: > 
-      "source /opt/ros/noetic/setup.bash &&
-      source /root/catkin_ws/devel/setup.bash &&
-      sleep 2 &&
-      roslaunch beaverbot_launch bringup.launch"
+    command: bash
 
   cartographer:
     user: root
@@ -65,7 +58,7 @@ services:
       - -f
       - /dev/null
 
-  robot_communication:
+  beaverbot-communication:
     user: root
     depends_on: 
       - ros-master
@@ -73,19 +66,11 @@ services:
     build:
       context: ..
       dockerfile: ./beaverbot_dockerfiles/Dockerfile.melodic
-    container_name: beaverbot_communication
+    container_name: beaverbot-communication
+    volumes:
+      - "/dev:/dev"
     privileged: True
     network_mode: host
     tty: True
     stdin_open: True
-    volumes:
-      - "/dev:/dev"
-    entrypoint:
-      - bash 
-      - -c
-    command: > 
-      "source /opt/ros/melodic/setup.bash &&
-      source /root/catkin_ws/devel/setup.bash &&
-      sleep 2 &&
-      roslaunch beaverbot_driver beaverbot_driver.launch"
-
+    command: bash
