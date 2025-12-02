@@ -25,6 +25,8 @@ RUN rosdep update && \
     rosdep install --from-paths src --ignore-src -r -y
 
 # Build ROS packages
+RUN catkin config --skiplist beaverbot_driver beaverbot_cartographer
+
 RUN . /opt/ros/noetic/setup.bash && \
     catkin config --skiplist beaverbot_driver && \
     catkin build && \
