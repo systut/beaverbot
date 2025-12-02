@@ -38,6 +38,32 @@ services:
       sleep 2 &&
       roslaunch beaverbot_launch bringup.launch"
 
+  cartographer:
+    user: root
+    depends_on: 
+      - ros-master
+    image: beaverbot:cartographer
+    build:
+      context: ..
+      dockerfile: ./beaverbot_dockerfiles/Dockerfile.cartographer
+    container_name: beaverbot_cartographer
+    privileged: True
+    network_mode: host
+    tty: True
+    stdin_open: True
+    volumes:
+      - "../beaverbot_localization/beaverbot_cartographer:/root/catkin_ws/src/beaverbot_localization/beaverbot_cartographer"
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+      - "/tmp/.docker.xauth:/tmp/.docker.xauth"
+      - "/dev:/dev"
+    environment:
+      - "DISPLAY=$DISPLAY"
+      - "XAUTHORITY=/tmp/.docker.xauth"
+      - "QT_X11_NO_MITSHM=1" 
+    entrypoint:
+      - tail
+      - -f
+      - /dev/null
 
   robot_communication:
     user: root

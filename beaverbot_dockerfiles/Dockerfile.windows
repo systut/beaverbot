@@ -33,7 +33,7 @@ RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
 RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
 # Build ROS packages
-RUN catkin config --skiplist beaverbot_driver
+RUN catkin config --skiplist beaverbot_driver beaverbot_cartographer
 
 # Build ROS packages
 RUN . /opt/ros/melodic/setup.bash && \

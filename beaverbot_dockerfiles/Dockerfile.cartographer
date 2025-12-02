@@ -1,0 +1,42 @@
+FROM osrf/ros:noetic-desktop-full
+
+ENV DISPLAY host.docker.internal:0.0
+
+# update and install dependencies
+RUN apt-get update
+
+RUN apt-get install -y python3-wstool python3-rosdep ninja-build stow git
+
+RUN apt install -y python3-osrf-pycommon python3-catkin-tools
+
+RUN apt install -y build-essential
+
+# copy directory specific to scart
+COPY ./beaverbot_localization/beaverbot_cartographer /root/catkin_ws/src/beaverbot_localization/beaverbot_cartographer
+
+# set default bash shell
+SHELL ["/bin/bash", "-c"]
+
+# set environment variable for ros
+RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
+
+WORKDIR /root/catkin_ws
+
+RUN wstool init src
+
+RUN wstool merge -t src https://raw.githubusercontent.com/cartographer-project/cartographer_ros/master/cartographer_ros.rosinstall
+
+RUN wstool update -t src
+
+RUN rosdep update 
+
+RUN cd /root/catkin_ws && sed -i '46d' /root/catkin_ws/src/cartographer/package.xml
+
+RUN source /opt/ros/noetic/setup.bash && rosdep install --from-paths src --ignore-src --rosdistro=noetic -y
+
+RUN cd /root/catkin_ws && src/cartographer/scripts/install_abseil.sh
+
+RUN /bin/bash -c "cd /root/catkin_ws &&  source /opt/ros/noetic/setup.bash &&  catkin_make_isolated --install --use-ninja -DPYTHON_EXECUTABLE=/usr/bin/python3"
+
+   
