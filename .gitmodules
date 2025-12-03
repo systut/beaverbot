@@ -10,3 +10,6 @@
 [submodule "beaverbot_sensors/f9p_ichimill"]
 	path = beaverbot_sensors/f9p_ichimill
 	url = https://github.com/Cylos9/f9p_ichimill.git
+[submodule "beaverbot_sensors/wit_node"]
+	path = beaverbot_sensors/wit_node
+	url = https://github.com/yowlings/wit_node
