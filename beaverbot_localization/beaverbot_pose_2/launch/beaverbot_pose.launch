@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="beaverbot_pose_2" pkg="beaverbot_pose_2" type="beaverbot_pose_2_node" output="screen">
+        <param name="~publish_rate" value="15.0"/>
+        <param name="~use_imu_rotation_angle" value="true"/>
+        <param name="~rotation_angle_deg" value="0.0"/> <!-- used when use_imu_rotation_angle is false -->
+        <param name="~gps_to_rear_axis" value="0.0"/>
+        <param name="~imu_offset" value="-97.95"/> <!-- 90.0 + magnetic declination angle-->
+        <remap from="gps/fix" to="/fix"/>
+        <remap from="imu/data_raw" to="/imu"/>
+    </node>
+</launch>

@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import rospy
+from beaverbot_pose_2.beaverbot_pose_2_node import BeaverbotPose2Node
+
+try:
+    beaverbot_pose_2_node = BeaverbotPose2Node()
+    beaverbot_pose_2_node.run()
+except rospy.ROSInterruptException:
+    pass
