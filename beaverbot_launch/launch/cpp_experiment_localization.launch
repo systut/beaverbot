@@ -1,0 +1,14 @@
+<launch>
+    <arg name="trajectory_file" default="$(find beaverbot_control)/trajectories/experiment_coverage_trajectory.csv"/>
+
+    <!-- Sensors -->
+    <include file="$(find beaverbot_launch)/launch/sensors.launch">
+        <arg name="lidar_enabled" value="false" />
+        <arg name="gnss_enabled" value="true" />
+        <arg name="imu_enabled" value="true" />
+    </include>
+
+    <!-- Localization -->
+    <include file="$(find beaverbot_pose_2)/launch/beaverbot_pose.launch" />
+
+</launch>
