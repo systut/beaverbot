@@ -20,6 +20,9 @@ import rospy
 from std_msgs.msg import Float64
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu, NavSatFix
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
+from std_msgs.msg import Header
 
 # Internal Libraries
 import geonav_transform.geonav_conversions as gc
@@ -47,6 +50,8 @@ class BeaverbotPose2Node:
         self._initial_yaw_enu = None
         self._initial_lat = None
         self._initial_lon = None
+        self._trajectory_msg = Path()
+        
         
         self._register_parameters()
 
@@ -99,6 +104,9 @@ class BeaverbotPose2Node:
         """
         self._odom_pub = rospy.Publisher(
             "/odom", Odometry, queue_size=10)
+        
+        self._trajectory_pub = rospy.Publisher(
+            "/trajectory", Path, queue_size=10)
 
         rospy.Timer(rospy.Duration(1.0 / self._publish_rate),
                     self._publish_odometry)
@@ -175,7 +183,6 @@ class BeaverbotPose2Node:
 
         odom_msg.twist.twist.angular.z = self._yaw_rate
 
-        rospy.loginfo(f"x_rear, y_rear, yaw: {self._x_rear}, {self._y_rear}, {self._yaw}")
         self._odom_pub.publish(odom_msg)
 
         self._tf_broadcaster.sendTransform(
@@ -186,6 +193,17 @@ class BeaverbotPose2Node:
             "base_link",
             "odom"
         )
+        
+        # publish trajectory
+        self._trajectory_msg.header.stamp = rospy.get_rostime()
+        self._trajectory_msg.header.frame_id = "odom"
+        self._trajectory_msg.poses.append(PoseStamped(
+            header=Header(stamp=rospy.get_rostime(), frame_id="odom"),
+            pose=Pose(position=Point(x=self._x_rear, y=self._y_rear, z=0), orientation=Quaternion(x=0, y=0, z=0, w=1))
+        ))
+        self._trajectory_pub.publish(self._trajectory_msg)
+        
+        rospy.loginfo(f"x_rear, y_rear, yaw: {self._x_rear}, {self._y_rear}, {self._yaw}")
 
     def _get_xy_from_latlon(self, lat, lon, initial_lat, initial_lon):
         """! Get x, y from latitude and longitude method
