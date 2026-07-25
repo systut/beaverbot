@@ -1,17 +1,29 @@
 <launch>
-    <arg name="simulation" default="true" />
-    <arg name="coverage_length" default="13.0"/>
+    <arg name="simulation" default="false" />
+    <!-- <arg name="coverage_length" default="13.0"/>
     <arg name="coverage_width" default="13.0"/>
     <arg name="coverage_iteration" default="2"/>
     <arg name="rvizconfig" default="$(find beaverbot_description)/rviz/urdf.rviz"/>
-    <arg name="model" default="$(find beaverbot_description)/urdf/beaverbot.urdf.xacro"/>
+    <arg name="model" default="$(find beaverbot_description)/urdf/beaverbot.urdf.xacro"/> -->
+    <arg name="rosbag_name" default="$(find beaverbot_launch)/rosbags/data.bag"/>
+    <!-- Toggle beaverbot_pose_node's between-GPS-fixes dead-reckoning: true = predicted
+         position every publish (default), false = raw last-fix position, held stale
+         between ~1 Hz GPS fixes (pre-dead-reckoning behavior). Override on the CLI with
+         e.g. `enable_position_prediction:=false`. -->
+    <arg name="enable_position_prediction" default="true"/>
+    <!-- Reject an incoming IMU orientation reading in beaverbot_pose_node if it implies
+         a yaw rate above this (rad/s) versus the last accepted reading; guards against
+         an observed IMU/driver fault where the sensor freezes for up to several seconds
+         then snaps to a new heading (an implied rate of tens of rad/s, versus this
+         robot's real ~2 rad/s max). Override on the CLI with e.g. `max_imu_yaw_rate:=3.0`. -->
+    <arg name="max_imu_yaw_rate" default="5.0"/>
 
-    <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
+    <!-- <param name="robot_description" command="$(find xacro)/xacro $(arg model)"/>
    
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
-            respawn="false" output="screen" />
+            respawn="false" output="screen" /> -->
 
     <group if = "$(arg simulation)">
         <include file="$(find beaverbot_launch)/launch/beaverbot_gazebo.launch">
@@ -20,10 +32,17 @@
         <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" required="true" >
           <param name="~log" value="false"/>
           <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
-          <param name="~publish_rate" value="0.1"/>
-          <param name="~rotation_angle" value="-90"/>
+          <param name="~publish_rate" value="0.05"/>
+          <param name="~enable_position_prediction" value="$(arg enable_position_prediction)"/>
+          <param name="~max_imu_yaw_rate" value="$(arg max_imu_yaw_rate)"/>
+          <param name="~rotation_angle" value="179"/>
           <param name="~gps_to_rear_axis" value="0.6"/>
           <param name="~imu_offset" value="0.05"/>
+          <!-- Align published pose with beaverbot_control/trajectories/lemniscate_trajectory.csv's
+               initial state, assuming the robot is placed at that pose before this node starts. -->
+          <param name="~initial_x" value="1.0"/>
+          <param name="~initial_y" value="0.0"/>
+          <param name="~initial_theta" value="1.5786512774347865"/>
         </node>
     </group>
     <group unless = "$(arg simulation)">
@@ -33,18 +52,25 @@
         <node name="beaverbot_pose_node" pkg="beaverbot_pose" type="beaverbot_pose_node" required="true" >
           <param name="~log" value="true"/>
           <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
-          <param name="~publish_rate" value="0.1"/>
-          <param name="~rotation_angle" value="85"/>
+          <param name="~publish_rate" value="0.05"/>
+          <param name="~enable_position_prediction" value="$(arg enable_position_prediction)"/>
+          <param name="~max_imu_yaw_rate" value="$(arg max_imu_yaw_rate)"/>
+          <param name="~rotation_angle" value="179"/>
           <param name="~gps_to_rear_axis" value="0.0"/>
           <param name="~imu_offset" value="-0.18981711362095213"/>
           <param name="~imu_calibration_threshold" value="400"/>
           <param name="~imu_epsilon" value="0.001"/>
+          <!-- Align published pose with beaverbot_control/trajectories/lemniscate_trajectory.csv's
+               initial state, assuming the robot is placed at that pose before this node starts. -->
+          <param name="~initial_x" value="1.0"/>
+          <param name="~initial_y" value="0.0"/>
+          <param name="~initial_theta" value="1.5786512774347865"/>
         </node>
     </group>
 
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+    <!-- <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
         <rosparam command="load" file="$(find beaverbot_launch)/config/laser_filter.yaml" />
-    </node>
+    </node> -->
 
     <!-- <node name="generate_trajectory_node" pkg="trajectory_generation" type="generate_trajectory" required="true">
       <param name="~iteration" value="$(arg coverage_iteration)"/>
@@ -52,13 +78,15 @@
       <param name="~width" value="$(arg coverage_width)"/>
     </node> -->
 
-    <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>  
+    <!-- <node name="obstacle_detection_node" pkg="obstacle_detection" type="obstacle_detection_node" required="true"/>   -->
 
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" />
+    <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find beaverbot_launch)/maps/dummy_map.yml" /> -->
     
-    <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/>
+    <!-- <include file="$(find beaverbot_control)/launch/beaverbot_control.launch"/> -->
 
     <!-- <node name="laserscan2costmap" pkg="laserscan2costmap" type="laserscan2costmap" output="screen"/> -->
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/>
+    <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"/> -->
+    <node name="rosbag" pkg="rosbag" type="record" args="-O $(arg rosbag_name) /imu /fix /beaverbot_pose/odom /beaverbot_pose/orientation /cmd_vel"/>
+
 </launch>

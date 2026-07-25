@@ -1,5 +1,5 @@
 <launch>
-    <arg name="lidar_enabled" default="true" />
+    <arg name="lidar_enabled" default="false" />
     <arg name="gnss_enabled" default="true" />
     <arg name="imu_enabled" default="true" />
 
@@ -20,15 +20,14 @@
     </node>
 
     <!-- GNSS -->
+    <!-- GNSS -->
     <include if="$(arg gnss_enabled)" file="$(find f9p_ichimill)/launch/gps_ichimill.launch">
         <arg name="port" value="$(arg gnss_port)" />
     </include>
 
     <!-- IMU -->
-    <node if="$(arg imu_enabled)" name="witmotion_imu" pkg="witmotion_ros"  type="witmotion_ros_node" output="screen">
-        <rosparam command="load" file="$(find beaverbot_launch)/config/hwt905.yaml" />
-        <param name="port" value="$(arg imu_port)" />
-        <param name="baud_rate" value="$(arg imu_baud)" />
-    </node>
+    <include if="$(arg imu_enabled)" file="$(find wit_node)/launch/wit.launch">
+        <arg name="port" value="$(arg imu_port)" />
+    </include>
 
 </launch>

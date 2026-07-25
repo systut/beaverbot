@@ -34,7 +34,8 @@ include_directories(
 # Install #
 ###########
 
-catkin_install_python(PROGRAMS 
+catkin_install_python(PROGRAMS
   scripts/beaverbot_pose_node
+  scripts/rotation_angle_calibrator
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

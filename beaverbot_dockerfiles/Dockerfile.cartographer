@@ -21,7 +21,7 @@ SHELL ["/bin/bash", "-c"]
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
 RUN echo "export ROS_MASTER_URI=http://localhost:11311" >> /root/.bashrc
 
-WORKDIR /root/catkin_ws
+WORKDIR /root/cartographer_ws
 
 RUN wstool init src
 
@@ -31,12 +31,16 @@ RUN wstool update -t src
 
 RUN rosdep update 
 
-RUN cd /root/catkin_ws && sed -i '46d' /root/catkin_ws/src/cartographer/package.xml
+RUN cd /root/cartographer_ws && sed -i '46d' /root/cartographer_ws/src/cartographer/package.xml
 
 RUN source /opt/ros/noetic/setup.bash && rosdep install --from-paths src --ignore-src --rosdistro=noetic -y
 
-RUN cd /root/catkin_ws && src/cartographer/scripts/install_abseil.sh
+RUN cd /root/cartographer_ws && src/cartographer/scripts/install_abseil.sh
 
-RUN /bin/bash -c "cd /root/catkin_ws &&  source /opt/ros/noetic/setup.bash &&  catkin_make_isolated --install --use-ninja -DPYTHON_EXECUTABLE=/usr/bin/python3"
+RUN /bin/bash -c "cd /root/cartographer_ws &&  source /opt/ros/noetic/setup.bash &&  catkin_make_isolated -j4 --install --use-ninja -DPYTHON_EXECUTABLE=/usr/bin/python3"
 
-   
+RUN echo "source /root/cartographer_ws/devel_isolated/setup.bash" >> /root/.bashrc
+
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash && cd /root/catkin_ws && catkin_make"
+
+RUN echo "source /root/catkin_ws/devel/setup.bash --extend" >> /root/.bashrc

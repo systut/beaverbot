@@ -1,12 +1,23 @@
 <?xml version="1.0"?>
 <launch>
-    <node name="hakuroukun_pose" pkg="hakuroukun_pose" type="hakuroukun_pose_node" output="screen">
+    <node name="beaverbot_pose" pkg="beaverbot_pose" type="beaverbot_pose_node" output="screen">
         <param name="~log" value="true"/>
-        <param name="~log_folder" value="$(find hakuroukun_pose)/log_data"/>
+        <param name="~log_folder" value="$(find beaverbot_pose)/log_data"/>
         <param name="~publish_rate" value="0.1"/>
-        <param name="~rotation_angle" value="-90"/>
+        <param name="~rotation_angle" value="179"/>
         <param name="~gps_to_rear_axis" value="0.6"/>
         <param name="~imu_offset" value="0.0"/>
+
+        <!-- Align the published pose with beaverbot_control/trajectories/lemniscate_trajectory.csv's
+             initial state (x=1.0, y=0.0, theta=1.5786512774347865 rad), assuming the robot is
+             physically placed at that pose (position + heading) before this node starts. Both the
+             GPS (x, y) frame and the yaw reference are rotated by initial_theta together (see
+             beaverbot_pose_node.py's _get_xy_from_latlon / _get_initial_orientation) so that
+             dx/dt = v*cos(yaw), dy/dt = v*sin(yaw) stays consistent after alignment. -->
+        <param name="~initial_x" value="1.0"/>
+        <param name="~initial_y" value="0.0"/>
+        <param name="~initial_theta" value="1.5786512774347865"/>
+
         <remap from="fix" to="gps/fix"/>
     </node>
 </launch>

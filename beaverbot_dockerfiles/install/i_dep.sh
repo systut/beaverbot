@@ -27,7 +27,8 @@ python_dep="rospy-message-converter \
          python-socketio  \
          python-socketio[client] \
          scipy \
-         pytz"
+         pytz \
+         cvxpy"
 
 apt-get update
 apt-get upgrade -y

@@ -1,0 +1,5 @@
+No protocol specified qt.qpa.xcb: could not connect to display :0 qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found. This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem. Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, xcb. Aborted (core dumped)
+
+run outside of container in the terminal either: xhost or xhost +local:docker
+
+useful link to github: https://github.com/cartographer-project/cartographer

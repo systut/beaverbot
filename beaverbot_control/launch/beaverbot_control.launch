@@ -1,11 +1,118 @@
 <launch>
     <node name="beaverbot_control_node" pkg="beaverbot_control" type="beaverbot_control_node" output="screen">
-        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_trajectory.csv"/>
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_trajectory.csv"/> -->
+        <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_slower_velocity_reference_0.2.csv"/>
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_slower_velocity_reference_0.3.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_slower_velocity_reference.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_bigger_path_reference.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.1.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.2.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.05.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.15.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.17.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.18.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.19.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_slip0.25.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_mpc_rls_acc_slip0.1.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_mpc_rls_acc_slip0.2.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_mpc_rls_acc_slip0.05.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_mpc_rls_acc_slip0.15.csv"/> -->
+        <!-- <param name="~trajectory_file" value="$(find beaverbot_control)/trajectories/lemniscate_compensated_mpc_rls_acc_slip0.25.csv"/> -->
         <param name="~sampling_time" value="0.05"/>
-        <param name="~controller_type" value="rls_compensator"/>
+
+        <!-- trajectory_type="wheel" reads columns 5/6 of the CSV as right_vel,left_vel (this
+             file's own header order) and derives [v, w] from them using the standard
+             w = (vr - vl) / wheel_base convention; required by all four controller_type
+             options below. -->
         <param name="~trajectory_type" value="wheel"/>
+
+        <!-- Controller selection: uncomment exactly one of the four controller_type lines below. -->
+
+        <!-- 1) feedforward: open-loop playback of the reference wheel velocities, no feedback. -->
+        <!-- <param name="~controller_type" value="feedforward"/> -->
+
+        <!-- 2) rls_compensator: estimates wheel slip online (RLS) and scales up the reference
+             velocities by 1/(1-slip); no MPC/prediction, just a velocity multiplier.
+             Tune via ~rls_use_forgetting_factor (default true; set false to use plain
+             predict_sim instead of predict_sim_with_forgetting_factor), ~rls_forgetting_factor
+             (default 0.98, only used when ~rls_use_forgetting_factor is true),
+             ~rls_slip_estimation_source (default "yaw": finite-differences the fused
+             beaverbot_pose_node heading each tick; "yaw_rate": uses the IMU's directly
+             measured angular_velocity_z instead, bypassing the fused pose/GPS entirely --
+             read off the same (remappable) "odom" topic's twist.twist.angular.z, which
+             beaverbot_pose_node already republishes from the IMU, so no separate /imu
+             subscription is needed), ~rls_slip_estimation_max_angular_velocity (default
+             0.4 rad/s; skips the RLS update whenever the last commanded |angular
+             velocity| exceeds this -- logged data shows the commanded/measured gap is
+             ~0 below this but grows substantially above it, i.e. dynamic response lag
+             during a sharp turn rather than persistent slip; without this gate,
+             "yaw_rate" mode has been observed to overturn during the reference's
+             sharpest curve and never recover. Set to 0 or negative to disable), and
+             ~rls_log_file (default unset; when set to a path, records
+             index/delta_t/yaw/yaw_previous/measured_angular_velocity_z/
+             last_commanded_angular_velocity/update_skipped_high_dynamics/raw_slip/
+             clipped_slip/v/w to CSV each step). -->
+        <!-- <param name="~controller_type" value="rls_compensator"/> -->
+        <!-- <param name="~rls_use_forgetting_factor" value="true"/> -->
+        <!-- <param name="~rls_forgetting_factor" value="0.98"/> -->
+        <!-- <param name="~rls_slip_estimation_source" value="yaw"/> -->
+        <!-- <param name="~rls_log_file" value="$(find beaverbot_control)/logs/rls_slip.csv"/> -->
+
+        <!-- 3) mpc: linear MPC tracking the reference trajectory, fixed/known slip factor
+             (~mpc_slip, default 0.0). Tune via ~mpc_horizon, ~mpc_vr_max, ~mpc_vl_max, ~mpc_du_max.
+             ~mpc_log_file (default unset, applies to both mpc and mpc_rls): when set to a path,
+             records index/nearest_index/delta_t/state(x,y,theta)/target(ref x,y,theta)/
+             error(x,y,theta)/vr_ref/vl_ref/delta_vr/delta_vl/vr_cmd/vl_cmd/v/w/slip/solver_status
+             to CSV each step useful for diagnosing tracking issues (e.g. the robot turning
+             and driving the wrong way) by inspecting the target position and error at the
+             moment it happens. slip is the fixed ~mpc_slip for plain mpc, or mpc_rls's current
+             RLS estimate each tick. -->
+        <param name="~controller_type" value="mpc"/>
+        <!-- <param name="~mpc_log_file" value="$(find beaverbot_control)/logs/mpc_tracking.csv"/> -->
+
+        <!-- Trial increase from the 0.5 m/s default: turn-tracking logs (data/20260717201300)
+             showed vr_cmd/vl_cmd pinned at the 0.5 m/s ceiling ~64% of turn-ticks, which lags
+             the desired correction and shows up as overshoot once the turn catches up. True
+             top speed isn't known, so this is a conservative +20% step to test with, not a
+             final value; watch for wheel slip / motor faults and dial back if it's too much.
+             ~mpc_du_max (slew-rate limit) also saturates often during turns but is left at its
+             default 0.05 here so this is a single-variable test. -->
+        <param name="~mpc_vr_max" value="0.6"/>
+        <param name="~mpc_vl_max" value="0.6"/>
+
+        <!-- 4) mpc_rls: same MPC as above, but the slip factor is estimated online (RLS) each
+             step instead of being fixed via ~mpc_slip. Same ~mpc_horizon/~mpc_vr_max/~mpc_vl_max/
+             ~mpc_du_max/~mpc_log_file tuning params apply, plus ~mpc_rls_forgetting_factor
+             (default 0.96) for the RLS forgetting factor used by its slip estimator, and
+             ~mpc_rls_slip_estimation_max_angular_velocity (default 0.4 rad/s; same
+             high-dynamics gate as ~rls_slip_estimation_max_angular_velocity above -- skips
+             the RLS update whenever the last commanded |angular velocity| exceeds this,
+             since during a sharp turn the commanded/measured gap is dynamic response lag
+             rather than persistent slip, and the MPC's own feedback correction would
+             otherwise compound that into a runaway overcorrection. Set to 0 or negative
+             to disable). -->
+        <!-- <param name="~controller_type" value="mpc_rls"/> -->
+        <!-- <param name="~mpc_rls_forgetting_factor" value="0.96"/> -->
+        <!-- <param name="~mpc_rls_slip_estimation_max_angular_velocity" value="0.4"/> -->
+
+        <!-- 5) pd: PD (proportional-derivative) tracking controller. Re-derives the tracked
+             trajectory index each tick from the robot's actual position (like mpc), rotates
+             the position error into the robot's heading frame to get longitudinal/lateral
+             errors, and layers a PD correction on the feedforward [v_ref, w_ref]. Tune via
+             ~pd_kp_v/~pd_kd_v (longitudinal/speed gains), ~pd_kp_theta/~pd_kd_theta (heading
+             gains), and ~pd_kp_lat (cross-track gain, feeds into angular velocity); defaults
+             are untuned starting points. ~pd_log_file (default unset): when set to a path,
+             records index/nearest_index/delta_t/state(x,y,theta)/ref(x,y,theta)/
+             e_lon/e_lat/e_theta/v_ref/w_ref/v/w to CSV each step. -->
+        <!-- <param name="~controller_type" value="pd"/> -->
+        <!-- <param name="~pd_kp_v" value="1.0"/> -->
+        <!-- <param name="~pd_kd_v" value="0.1"/> -->
+        <!-- <param name="~pd_kp_theta" value="2.0"/> -->
+        <!-- <param name="~pd_kd_theta" value="0.1"/> -->
+        <!-- <param name="~pd_kp_lat" value="1.0"/> -->
+        <!-- <param name="~pd_log_file" value="$(find beaverbot_control)/logs/pd_tracking.csv"/> -->
+
         <remap from="cmd_vel" to="/cmd_vel"/>
         <remap from="odom" to="/ground_truth/odom"/>
-        <remap from="imu/data_raw" to="imu"/>
     </node>
 </launch>

@@ -17,8 +17,12 @@
 <launch>
   <param name="/use_sim_time" value="false" />
 <!-- <arg name="base_frame" default="base_link"/>
-<arg name="odom_frame" default="base_link"/>
-<node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser_broadcaster" args="0 0 0 0 0 0 base_link laser 100"/> -->
+<arg name="odom_frame" default="base_link"/> -->
+
+<node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0.3 0 0 3.1415927 0 0 base_link laser 100"/>
+<!-- <node pkg="tf" type="static_transform_publisher" name="base_link_dummy_to_base_link" args="0 0 0 0 0 0 base_link_dummy base_link 100"/> -->
+
+
 <!-- Start RPLIDAR sensor node which provides LaserScan data  -->
 <!-- Config in carto ws isolated install share carto ros config  -->
   <node name="cartographer_node" pkg="cartographer_ros"
@@ -26,7 +30,7 @@
           -configuration_directory $(find beaverbot_cartographer)/configuration_files
           -configuration_basename slam.lua"   
       output="screen">
-      <remap from="scan" to="scan_filtered" />
+      <!-- <remap from="scan" to="scan_filtered" /> -->
   </node>
 
   <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"

@@ -18,12 +18,14 @@ import numpy as np
 from nav_msgs.msg import Odometry, Path
 from scipy.spatial.transform import Rotation
 from geometry_msgs.msg import Twist, PoseStamped
-from sensor_msgs.msg import Imu
 
 # Internal library
 from beaverbot_control.pure_pursuit import PurePursuit
 from beaverbot_control.feedforward import FeedForward
 from beaverbot_control.rls_compensator import RLSCompensator
+from beaverbot_control.mpc import MPC
+from beaverbot_control.mpc_rls import MPCRLS
+from beaverbot_control.pd_controller import PDController
 
 
 class BeaverbotControl(object):
@@ -76,6 +78,65 @@ class BeaverbotControl(object):
         self._trajectory_type = rospy.get_param(
             "~trajectory_type", "derivative")
 
+        self._mpc_horizon = rospy.get_param(
+            "~mpc_horizon", 10)
+
+        self._mpc_slip = rospy.get_param(
+            "~mpc_slip", 0.0)
+
+        self._mpc_vr_max = rospy.get_param(
+            "~mpc_vr_max", 0.5)
+
+        self._mpc_vl_max = rospy.get_param(
+            "~mpc_vl_max", 0.5)
+
+        self._mpc_du_max = rospy.get_param(
+            "~mpc_du_max", 0.05)
+
+        self._mpc_log_file = rospy.get_param(
+            "~mpc_log_file", None)
+
+        self._mpc_rls_forgetting_factor = rospy.get_param(
+            "~mpc_rls_forgetting_factor", 0.96)
+
+        self._mpc_rls_slip_estimation_max_angular_velocity = rospy.get_param(
+            "~mpc_rls_slip_estimation_max_angular_velocity", 0.4)
+
+        self._rls_use_forgetting_factor = rospy.get_param(
+            "~rls_use_forgetting_factor", True)
+
+        self._rls_forgetting_factor = rospy.get_param(
+            "~rls_forgetting_factor", 0.98)
+
+        self._rls_log_file = rospy.get_param(
+            "~rls_log_file", None)
+
+        self._rls_slip_estimation_source = rospy.get_param(
+            "~rls_slip_estimation_source", "yaw")
+
+        self._rls_slip_estimation_max_angular_velocity = rospy.get_param(
+            "~rls_slip_estimation_max_angular_velocity", 0.4)
+
+        self._measured_angular_velocity_z = None
+
+        self._pd_kp_v = rospy.get_param(
+            "~pd_kp_v", 1.0)
+
+        self._pd_kd_v = rospy.get_param(
+            "~pd_kd_v", 0.1)
+
+        self._pd_kp_theta = rospy.get_param(
+            "~pd_kp_theta", 2.0)
+
+        self._pd_kd_theta = rospy.get_param(
+            "~pd_kd_theta", 0.1)
+
+        self._pd_kp_lat = rospy.get_param(
+            "~pd_kp_lat", 1.0)
+
+        self._pd_log_file = rospy.get_param(
+            "~pd_log_file", None)
+
         self._state = None
 
         self._nu = 2
@@ -99,7 +160,49 @@ class BeaverbotControl(object):
             self._controller = FeedForward(trajectory)
 
         elif self._controller_type == "rls_compensator":
-            self._controller = RLSCompensator(trajectory)
+            # ROS params can't express None directly -- a non-positive
+            # value is the CLI-friendly way to disable the high-dynamics
+            # gate (see RLSCompensator.slip_estimation_max_angular_velocity).
+            max_angular_velocity = self._rls_slip_estimation_max_angular_velocity
+            if max_angular_velocity is not None and max_angular_velocity <= 0:
+                max_angular_velocity = None
+
+            self._controller = RLSCompensator(
+                trajectory,
+                use_forgetting_factor=self._rls_use_forgetting_factor,
+                forgetting_factor=self._rls_forgetting_factor,
+                slip_estimation_source=self._rls_slip_estimation_source,
+                slip_estimation_max_angular_velocity=max_angular_velocity,
+                log_file=self._rls_log_file)
+
+        elif self._controller_type == "mpc":
+            self._controller = MPC(
+                trajectory, self._length_base, self._sampling_time,
+                N_horizon=self._mpc_horizon, slip=self._mpc_slip,
+                vr_max=self._mpc_vr_max, vl_max=self._mpc_vl_max,
+                du_max=self._mpc_du_max, log_file=self._mpc_log_file)
+
+        elif self._controller_type == "mpc_rls":
+            # ROS params can't express None directly -- a non-positive
+            # value is the CLI-friendly way to disable the high-dynamics
+            # gate (see MPCRLS.slip_estimation_max_angular_velocity).
+            mpc_rls_max_angular_velocity = self._mpc_rls_slip_estimation_max_angular_velocity
+            if mpc_rls_max_angular_velocity is not None and mpc_rls_max_angular_velocity <= 0:
+                mpc_rls_max_angular_velocity = None
+
+            self._controller = MPCRLS(
+                trajectory, self._length_base, self._sampling_time,
+                N_horizon=self._mpc_horizon,
+                vr_max=self._mpc_vr_max, vl_max=self._mpc_vl_max,
+                du_max=self._mpc_du_max, log_file=self._mpc_log_file,
+                lam=self._mpc_rls_forgetting_factor,
+                slip_estimation_max_angular_velocity=mpc_rls_max_angular_velocity)
+
+        elif self._controller_type == "pd":
+            self._controller = PDController(
+                trajectory, kp_v=self._pd_kp_v, kd_v=self._pd_kd_v,
+                kp_theta=self._pd_kp_theta, kd_theta=self._pd_kd_theta,
+                kp_lat=self._pd_kp_lat, log_file=self._pd_log_file)
         else:
             raise NotImplementedError
 
@@ -108,8 +211,17 @@ class BeaverbotControl(object):
         """
         rospy.Subscriber("odom", Odometry,
                          self._odom_callback)
-        rospy.Subscriber("/imu/data_raw", Imu,
-                         self._imu_callback)
+
+        # A separate /imu subscriber for the fused heading was removed
+        # previously because writing its raw, uncorrected orientation into
+        # self._state alongside beaverbot_pose_node's already-calibrated
+        # fused heading made heading alternate between the two, corrupting
+        # yaw-diff-based estimators like RLSCompensator. No second
+        # subscriber is needed for slip_estimation_source="yaw_rate"
+        # either: the same "odom" topic already carries
+        # twist.twist.angular.z (beaverbot_pose_node republishes the IMU's
+        # raw measured yaw rate there) -- see _odom_callback, which stores
+        # it in its own attribute, never written into self._state.
 
     def _register_publishers(self):
         """! Register publisher
@@ -144,30 +256,18 @@ class BeaverbotControl(object):
         self._state = [msg.pose.pose.position.x,
                        msg.pose.pose.position.y,
                        heading]
-    
-    def _imu_callback(self, msg):
-        """
-        Imu callback, bacause the real robot does not have odometry
-        it has only Imu to read orientation
-        """
-        quaternion = (
-            msg.orientation.x,
-            msg.orientation.y,
-            msg.orientation.z,
-            msg.orientation.w,
-        )
 
-        heading = Rotation.from_quat(quaternion).as_euler(
-            "zyx", degrees=False)[0]
-
-        self._state = [0, 0,
-                       heading]
+        # Kept separate from self._state (which only carries position/
+        # heading) specifically to feed RLSCompensator's
+        # slip_estimation_source="yaw_rate" mode -- beaverbot_pose_node
+        # republishes the IMU's raw measured yaw rate here.
+        self._measured_angular_velocity_z = msg.twist.twist.angular.z
 
     def _timer_callback(self, event):
         """! Timer callback
         @param event<Event>: The event
         """
-        if not self._state and self._controller_type in ["pure_pursuit", "rls_compensator"]:
+        if not self._state and self._controller_type in ["pure_pursuit", "rls_compensator", "mpc", "mpc_rls", "pd"]:
             rospy.logwarn("No current status of the vehicle")
 
             return
@@ -177,7 +277,14 @@ class BeaverbotControl(object):
 
             return
 
-        status, u = self._controller.execute(self._state, None, self._index, self._sampling_time)
+        input_value = (
+            self._measured_angular_velocity_z
+            if (self._controller_type == "rls_compensator"
+                and self._rls_slip_estimation_source == "yaw_rate")
+            else None)
+
+        status, u = self._controller.execute(
+            self._state, input_value, self._index, self._sampling_time)
 
         if not status:
             rospy.logwarn("Failed to execute controller")
@@ -307,10 +414,12 @@ class BeaverbotControl(object):
         elif trajectory_type == "wheel":
             u = np.zeros((self._nu, len(data) - initial_index))
 
-            u[0, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) + 
-                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / 2
+            vel_right = np.array(data[initial_index:, 1 + nx: 1 + nx + 1]).reshape(-1)
 
-            u[1, :] = (np.array(data[initial_index:, 1 + nx: 1 + nx + 1]) - 
-                       np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2])).reshape(-1) / self._length_base
+            vel_left = np.array(data[initial_index:, 1 + nx + 1: 1 + nx + 2]).reshape(-1)
+
+            u[0, :] = (vel_right + vel_left) / 2
+
+            u[1, :] = (vel_right - vel_left) / self._length_base
 
         return u

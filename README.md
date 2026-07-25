@@ -239,6 +239,9 @@ In terminal 3
 ```bash
 docker -f [docker-compose-file] compose exec beaverbot -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
 ```
+```
+docker exec beaverbot_nura -c "source /opt/ros/noetic/setup.bash && source /root/catkin_ws/devel/setup.bash && sleep 2 && roslaunch beaverbot_control beaverbot_control.launch"
+```
 
 ## USB Device Setup for Windows
 

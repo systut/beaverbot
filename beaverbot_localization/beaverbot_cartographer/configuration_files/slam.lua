@@ -20,7 +20,7 @@ options = {
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map", --default = "map"
   tracking_frame = "base_link",
-  published_frame = "base_link`",  --default ="base_link"
+  published_frame = "base_link",  --default ="base_link"
   odom_frame = "odom",
   provide_odom_frame = true,
   publish_frame_projected_to_2d = true,
