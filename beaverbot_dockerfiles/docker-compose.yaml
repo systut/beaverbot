@@ -29,18 +29,18 @@ services:
     network_mode: host
     tty: True
     stdin_open: True
-    entrypoint:
-      - tail 
-      - -f
-      - /dev/null
     # entrypoint:
-    #   - bash 
-    #   - -c
-    # command: > 
-    #   "source /opt/ros/noetic/setup.bash && 
-    #   source /root/catkin_ws/devel/setup.bash &&
-    #   sleep 2 &&
-    #   roslaunch beaverbot_launch bringup.launch"
+    #   - tail 
+    #   - -f
+    #   - /dev/null
+    entrypoint:
+      - bash 
+      - -c
+    command: > 
+      "source /opt/ros/noetic/setup.bash && 
+      source /root/catkin_ws/devel/setup.bash &&
+      sleep 2 &&
+      roslaunch beaverbot_launch bringup.launch"
 
   # cartographer:
   #   user: root
