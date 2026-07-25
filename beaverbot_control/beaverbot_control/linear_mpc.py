@@ -55,7 +55,7 @@ class LinearMPC:
 
         self.Q = Q if Q is not None else np.diag([50.0, 50.0, 10.0])
 
-        self.R = R if R is not None else np.diag([0.5, 0.5])
+        self.R = R if R is not None else np.diag([0.3, 0.3])
 
         self.Q_N = Q_N if Q_N is not None else np.diag([50.0, 50.0, 10.0])
 

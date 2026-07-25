@@ -173,9 +173,17 @@ class MPCRLS(MPC):
 
         self._yaw_previous = unwrapped_yaw
 
+        # Raw RLS fit before any clipping/warmup override -- recorded (via the
+        # base MPC's raw_slip column) so offline analysis can see what the
+        # estimator actually produced, including negative fits or values the
+        # clip/warmup below would otherwise hide.
+        raw_slip = float(self._rls.estimates[-1][0, 0])
+
+        self._raw_slip = raw_slip
+
         # Slip is a wheel-speed deficit, not a surplus, so a negative fit is
         # measurement noise rather than a real effect -- floor it to 0.
-        slip = float(np.clip(self._rls.estimates[-1][0, 0], 0.0, self._slip_clip))
+        slip = float(np.clip(raw_slip, 0.0, self._slip_clip))
 
         if self._step < self._warmup_steps:
             slip = 0.0
