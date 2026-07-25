@@ -47,7 +47,9 @@ class MPCRLS(MPC):
     # ==================================================================================================
     def __init__(self, trajectory, wheel_base, sampling_time, N_horizon=10,
                  vr_max=0.5, vl_max=0.5, du_max=0.05,
-                 warmup_steps=50, slip_clip=0.3, lam=0.96, log_file=None):
+                 warmup_steps=50, slip_clip=0.3,
+                 slip_estimation_max_angular_velocity=0.4,
+                 lam=0.96, log_file=None):
         """! Constructor
         @param trajectory<instance>: The trajectory
         @param wheel_base<float>: Distance between the wheels of the robot.
@@ -60,7 +62,20 @@ class MPCRLS(MPC):
         @param warmup_steps<int>: Number of initial steps the slip
         estimate is forced to 0.0 while RLS converges.
         @param slip_clip<float>: The estimated slip is clipped to
-        [-slip_clip, slip_clip].
+        [0, slip_clip].
+        @param slip_estimation_max_angular_velocity<float or None>: Skip
+        the RLS update (hold the last estimate) on any tick where the
+        last commanded |angular velocity| exceeds this -- see
+        RLSCompensator's parameter of the same name for the full
+        rationale. In short: RLSOnline's model assumes a static gain
+        (measured ~= commanded * (1-slip)), which only holds once the
+        vehicle has settled into a turn; during a sharp turn the gap
+        between commanded and measured rotation is dynamic response
+        lag/inertia, not persistent slip, and feeding that into a static
+        model creates a runaway feedback loop -- the MPC's own feedback
+        correction pushes the commanded angular velocity higher still,
+        which (falsely) looks like even more slip. Set to None to
+        disable this gate.
         @param lam<float>: Forgetting factor used by the RLS estimator.
         @param log_file<str or None>: If set, the path of a CSV file to
         record the tracking state at every step (see MPC.__init__).
@@ -81,6 +96,8 @@ class MPCRLS(MPC):
         self._warmup_steps = warmup_steps
 
         self._slip_clip = slip_clip
+
+        self._slip_estimation_max_angular_velocity = slip_estimation_max_angular_velocity
 
         self._lam = lam
 
@@ -126,7 +143,18 @@ class MPCRLS(MPC):
         """
         unwrapped_yaw = np.unwrap([state[2]])[0]
 
-        if self._yaw_previous is not None and self._last_w_cmd is not None:
+        # See slip_estimation_max_angular_velocity in __init__: skip the
+        # update entirely on a tick where the vehicle is mid-sharp-turn --
+        # the deficit between commanded and measured rotation there is
+        # dynamic lag, not persistent slip, and letting it drive the
+        # estimate compounds into a runaway overcorrection right when the
+        # trajectory is hardest to track.
+        high_dynamics = (
+            self._slip_estimation_max_angular_velocity is not None
+            and self._last_w_cmd is not None
+            and abs(self._last_w_cmd) > self._slip_estimation_max_angular_velocity)
+
+        if self._yaw_previous is not None and self._last_w_cmd is not None and not high_dynamics:
             # The yaw change observed now is the effect of what was actually
             # commanded last tick (self._last_w_cmd) -- not the raw reference
             # angular velocity at the current nearest_index, which is what
@@ -145,7 +173,9 @@ class MPCRLS(MPC):
 
         self._yaw_previous = unwrapped_yaw
 
-        slip = float(np.clip(self._rls.estimates[-1][0, 0], -self._slip_clip, self._slip_clip))
+        # Slip is a wheel-speed deficit, not a surplus, so a negative fit is
+        # measurement noise rather than a real effect -- floor it to 0.
+        slip = float(np.clip(self._rls.estimates[-1][0, 0], 0.0, self._slip_clip))
 
         if self._step < self._warmup_steps:
             slip = 0.0

@@ -113,8 +113,7 @@ class BeaverbotPoseNode:
 
         self._last_imu_time = None
 
-        self._extrapolation_time_constant = rospy.get_param(
-            "~extrapolation_time_constant", 0.5)
+        self._last_predict_time = None
 
         rospy.loginfo(
             "beaverbot_pose_node initial pose params: "
@@ -291,6 +290,16 @@ class BeaverbotPoseNode:
 
         self._last_gps_time = now
 
+        # Re-anchor the incremental dead-reckoning accumulator (see
+        # _predict_pose) to this fresh, trusted fix -- otherwise it would
+        # keep integrating forward from wherever it drifted to since the
+        # previous fix instead of snapping back to ground truth.
+        self._x_predicted = x_rear
+
+        self._y_predicted = y_rear
+
+        self._last_predict_time = now
+
     def _encoder_odom_callback(self, data: Odometry):
         """! Encoder odometry callback method
         @param data: Odometry message published by encoder_to_odom (see
@@ -392,21 +401,41 @@ class BeaverbotPoseNode:
         matching encoder_to_odom's own nonholonomic (y_dot_b_ = 0)
         assumption.
 
-        The clamp/lag below is kept as a safety net for a bad/glitched
-        encoder reading, even though it matters less now that the
-        velocity source isn't a stale 1 s average: extrapolation speed is
-        clamped to ~max_extrapolation_speed (a physically plausible
-        bound), and the displacement is a first-order lag that saturates
-        toward velocity * ~extrapolation_time_constant instead of growing
-        linearly with dt. Disabled via ~enable_position_prediction
-        (default true) -- when false, returns the raw last-fix position
-        unchanged, i.e. the pre-dead-reckoning behavior.
+        Displacement is integrated incrementally, one small publish-timer
+        tick (~publish_rate, default 0.1 s) at a time, accumulating into
+        self._x_predicted/self._y_predicted -- not recomputed from
+        scratch each call as (this instant's velocity) * (total time
+        since the last fix). That "recompute from scratch" approach was
+        tried twice and both versions shared the same underlying flaw:
+        multiplying a single instantaneous velocity sample by up to a
+        full ~1 s means whatever the encoder happens to read *right now*
+        retroactively stands in for the whole gap. A saturating
+        time-constant ceiling on top of that (the first version) bounded
+        the damage but also made the prediction silently stop advancing
+        partway through every gap, causing a once-per-fix catch-up jump.
+        Removing the ceiling (the second version) removed the jump but
+        made the flaw worse: a single momentary low/zero encoder reading
+        -- normal during a turn, when forward speed legitimately dips --
+        now zeroed out the *entire* displacement estimate since the last
+        fix instead of just one small tick's worth, so the published
+        position could stall near the last fix for the whole gap while
+        yaw kept updating from the IMU every tick, i.e. the robot reads
+        as rotating in place. Integrating tick-by-tick fixes both: each
+        tick only ever contributes that tick's own small dt, so a
+        momentary bad sample costs one small increment, not the whole
+        window, while genuine sustained motion still accumulates properly
+        across the gap. Disabled via ~enable_position_prediction (default
+        true) -- when false, returns the raw last-fix position unchanged.
         @return<tuple>: The predicted (x_rear, y_rear)
         """
         if not self._enable_position_prediction or self._last_gps_time is None:
             return self._x_rear, self._y_rear
 
-        dt = (rospy.Time.now() - self._last_gps_time).to_sec()
+        now = rospy.Time.now()
+
+        dt = (now - self._last_predict_time).to_sec()
+
+        self._last_predict_time = now
 
         speed = abs(self._encoder_linear_velocity)
 
@@ -420,14 +449,11 @@ class BeaverbotPoseNode:
 
         vy = speed * math.sin(self._yaw)
 
-        weight = self._extrapolation_time_constant * \
-            (1 - math.exp(-dt / self._extrapolation_time_constant))
+        self._x_predicted += vx * dt
 
-        x = self._x_rear + vx * weight
+        self._y_predicted += vy * dt
 
-        y = self._y_rear + vy * weight
-
-        return x, y
+        return self._x_predicted, self._y_predicted
 
     def _publish_rear_wheel_odometry(self, timer):
         """! Publish rear wheel pose method

@@ -100,12 +100,23 @@ class RLSOnline:
         return yaw_moved or position_moved
 
     #writing method to estimate slip from simulation data
-    def predict_sim(self, yaw, yaw_previous, ground_angular_velocity_z, delta_t, position=None):
+    def predict_sim(self, yaw, yaw_previous, ground_angular_velocity_z, delta_t,
+                     position=None, measured_angular_velocity_z=None):
             """
             First calculating the theta difference and the angular velocity
+
+            measured_angular_velocity_z, when given, is the IMU's directly
+            measured yaw rate for this tick -- used in place of
+            finite-differencing yaw/yaw_previous (see
+            RLSCompensator's slip_estimation_source="yaw_rate"). This bypasses
+            the fused pose entirely, so it isn't subject to that pose's own
+            staleness characteristics (GPS-rate position holds, etc.).
             """
-            yaw_diff= np.array([yaw - yaw_previous])
-            yaw_diff = np.arctan2(np.sin(yaw_diff), np.cos(yaw_diff))  # wrap to [-pi, pi]
+            if measured_angular_velocity_z is not None:
+                yaw_diff = np.array([measured_angular_velocity_z * delta_t])
+            else:
+                yaw_diff= np.array([yaw - yaw_previous])
+                yaw_diff = np.arctan2(np.sin(yaw_diff), np.cos(yaw_diff))  # wrap to [-pi, pi]
 
             motion = self._detect_motion(position, float(yaw_diff[0]))
             self._position_previous = position
@@ -141,12 +152,23 @@ class RLSOnline:
             # increase the time step
             self.previousTimeStep = self.previousTimeStep + 1
     
-    def predict_sim_with_forgetting_factor(self, yaw, yaw_previous, ground_angular_velocity_z, delta_t, lam = 0.98, position=None):
+    def predict_sim_with_forgetting_factor(self, yaw, yaw_previous, ground_angular_velocity_z, delta_t,
+                                            lam = 0.98, position=None, measured_angular_velocity_z=None):
             """
             First calculating the theta difference and the angular velocity
+
+            measured_angular_velocity_z, when given, is the IMU's directly
+            measured yaw rate for this tick -- used in place of
+            finite-differencing yaw/yaw_previous (see
+            RLSCompensator's slip_estimation_source="yaw_rate"). This bypasses
+            the fused pose entirely, so it isn't subject to that pose's own
+            staleness characteristics (GPS-rate position holds, etc.).
             """
-            yaw_diff= np.array([yaw - yaw_previous])
-            yaw_diff = np.arctan2(np.sin(yaw_diff), np.cos(yaw_diff))  # wrap to [-pi, pi]
+            if measured_angular_velocity_z is not None:
+                yaw_diff = np.array([measured_angular_velocity_z * delta_t])
+            else:
+                yaw_diff= np.array([yaw - yaw_previous])
+                yaw_diff = np.arctan2(np.sin(yaw_diff), np.cos(yaw_diff))  # wrap to [-pi, pi]
 
             motion = self._detect_motion(position, float(yaw_diff[0]))
             self._position_previous = position

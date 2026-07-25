@@ -78,12 +78,16 @@ class MPC:
         if self.log_file:
             with open(self.log_file, mode="w", newline="") as file:
                 writer = csv.writer(file)
+                # "slip" is self._mpc.s at the time of this row -- the fixed
+                # value passed in here for plain MPC, or MPCRLS's freshly
+                # estimated value each tick (see MPCRLS._update_slip_estimate).
                 writer.writerow(["index", "nearest_index", "delta_t",
                                   "state_x", "state_y", "state_theta",
                                   "ref_x", "ref_y", "ref_theta",
                                   "error_x", "error_y", "error_theta",
                                   "vr_ref", "vl_ref", "delta_vr", "delta_vl",
-                                  "vr_cmd", "vl_cmd", "v", "w", "solver_status"])
+                                  "vr_cmd", "vl_cmd", "v", "w", "slip",
+                                  "solver_status"])
 
     def execute(self, state, input, index, delta_t):
         """! Execute the controller
@@ -124,7 +128,8 @@ class MPC:
 
         self._record_step(index, nearest_index, delta_t, state, reference_state,
                           error_state, vr_ref, vl_ref, delta_vr, delta_vl,
-                          vr_cmd, vl_cmd, v, w, self._mpc.problem.status)
+                          vr_cmd, vl_cmd, v, w, self._mpc.s,
+                          self._mpc.problem.status)
 
         return True, [v, w]
 
@@ -133,7 +138,7 @@ class MPC:
     # ==================================================================================================
     def _record_step(self, index, nearest_index, delta_t, state, reference_state,
                       error_state, vr_ref, vl_ref, delta_vr, delta_vl,
-                      vr_cmd, vl_cmd, v, w, solver_status):
+                      vr_cmd, vl_cmd, v, w, slip, solver_status):
         """! Append one row of the current tracking state to log_file.
         @param index<int>: The elapsed-tick counter from the node
         @param nearest_index<int>: The trajectory index actually tracked
@@ -151,6 +156,9 @@ class MPC:
         @param vl_cmd<float>: Commanded left wheel velocity (vl_ref + delta_vl)
         @param v<float>: The commanded linear velocity
         @param w<float>: The commanded angular velocity
+        @param slip<float>: The slip factor used by the MPC's system model
+        this step -- fixed for plain MPC, MPCRLS's current RLS estimate
+        otherwise (see MPCRLS._update_slip_estimate).
         @param solver_status<str>: The cvxpy solver status for this step
         """
         if not self.log_file:
@@ -162,7 +170,7 @@ class MPC:
                               reference_state[0], reference_state[1], reference_state[2],
                               error_state[0], error_state[1], error_state[2],
                               vr_ref, vl_ref, delta_vr, delta_vl,
-                              vr_cmd, vl_cmd, v, w, solver_status])
+                              vr_cmd, vl_cmd, v, w, slip, solver_status])
 
     def _search_nearest_index(self, state):
         """! Find the trajectory index nearest to the robot's current

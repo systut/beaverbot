@@ -35,22 +35,38 @@
              velocities by 1/(1-slip); no MPC/prediction, just a velocity multiplier.
              Tune via ~rls_use_forgetting_factor (default true; set false to use plain
              predict_sim instead of predict_sim_with_forgetting_factor), ~rls_forgetting_factor
-             (default 0.98, only used when ~rls_use_forgetting_factor is true), and
-             ~rls_log_file (default unset; when set to a path, records index/delta_t/yaw/
-             yaw_previous/angular_velocity/raw_slip/clipped_slip/v/w to CSV each step). -->
+             (default 0.98, only used when ~rls_use_forgetting_factor is true),
+             ~rls_slip_estimation_source (default "yaw": finite-differences the fused
+             beaverbot_pose_node heading each tick; "yaw_rate": uses the IMU's directly
+             measured angular_velocity_z instead, bypassing the fused pose/GPS entirely --
+             read off the same (remappable) "odom" topic's twist.twist.angular.z, which
+             beaverbot_pose_node already republishes from the IMU, so no separate /imu
+             subscription is needed), ~rls_slip_estimation_max_angular_velocity (default
+             0.4 rad/s; skips the RLS update whenever the last commanded |angular
+             velocity| exceeds this -- logged data shows the commanded/measured gap is
+             ~0 below this but grows substantially above it, i.e. dynamic response lag
+             during a sharp turn rather than persistent slip; without this gate,
+             "yaw_rate" mode has been observed to overturn during the reference's
+             sharpest curve and never recover. Set to 0 or negative to disable), and
+             ~rls_log_file (default unset; when set to a path, records
+             index/delta_t/yaw/yaw_previous/measured_angular_velocity_z/
+             last_commanded_angular_velocity/update_skipped_high_dynamics/raw_slip/
+             clipped_slip/v/w to CSV each step). -->
         <!-- <param name="~controller_type" value="rls_compensator"/> -->
         <!-- <param name="~rls_use_forgetting_factor" value="true"/> -->
         <!-- <param name="~rls_forgetting_factor" value="0.98"/> -->
+        <!-- <param name="~rls_slip_estimation_source" value="yaw"/> -->
         <!-- <param name="~rls_log_file" value="$(find beaverbot_control)/logs/rls_slip.csv"/> -->
 
         <!-- 3) mpc: linear MPC tracking the reference trajectory, fixed/known slip factor
              (~mpc_slip, default 0.0). Tune via ~mpc_horizon, ~mpc_vr_max, ~mpc_vl_max, ~mpc_du_max.
              ~mpc_log_file (default unset, applies to both mpc and mpc_rls): when set to a path,
              records index/nearest_index/delta_t/state(x,y,theta)/target(ref x,y,theta)/
-             error(x,y,theta)/vr_ref/vl_ref/delta_vr/delta_vl/vr_cmd/vl_cmd/v/w/solver_status
+             error(x,y,theta)/vr_ref/vl_ref/delta_vr/delta_vl/vr_cmd/vl_cmd/v/w/slip/solver_status
              to CSV each step useful for diagnosing tracking issues (e.g. the robot turning
              and driving the wrong way) by inspecting the target position and error at the
-             moment it happens. -->
+             moment it happens. slip is the fixed ~mpc_slip for plain mpc, or mpc_rls's current
+             RLS estimate each tick. -->
         <param name="~controller_type" value="mpc"/>
         <!-- <param name="~mpc_log_file" value="$(find beaverbot_control)/logs/mpc_tracking.csv"/> -->
 
@@ -67,9 +83,17 @@
         <!-- 4) mpc_rls: same MPC as above, but the slip factor is estimated online (RLS) each
              step instead of being fixed via ~mpc_slip. Same ~mpc_horizon/~mpc_vr_max/~mpc_vl_max/
              ~mpc_du_max/~mpc_log_file tuning params apply, plus ~mpc_rls_forgetting_factor
-             (default 0.96) for the RLS forgetting factor used by its slip estimator. -->
+             (default 0.96) for the RLS forgetting factor used by its slip estimator, and
+             ~mpc_rls_slip_estimation_max_angular_velocity (default 0.4 rad/s; same
+             high-dynamics gate as ~rls_slip_estimation_max_angular_velocity above -- skips
+             the RLS update whenever the last commanded |angular velocity| exceeds this,
+             since during a sharp turn the commanded/measured gap is dynamic response lag
+             rather than persistent slip, and the MPC's own feedback correction would
+             otherwise compound that into a runaway overcorrection. Set to 0 or negative
+             to disable). -->
         <!-- <param name="~controller_type" value="mpc_rls"/> -->
         <!-- <param name="~mpc_rls_forgetting_factor" value="0.96"/> -->
+        <!-- <param name="~mpc_rls_slip_estimation_max_angular_velocity" value="0.4"/> -->
 
         <!-- 5) pd: PD (proportional-derivative) tracking controller. Re-derives the tracked
              trajectory index each tick from the robot's actual position (like mpc), rotates
